@@ -2,7 +2,7 @@ import asyncore, socket
 
 class Client(asyncore.dispatcher_with):
 
-     def __init__(self, host, port, message):
+    def __init__(self, host, port, message):
         asyncore.dispatcher.__init__(self)
         self.createsocket(socket.AF_INET, socket.SOCK_STREAM)
         self.connect((host, port))
