@@ -1,6 +1,6 @@
 import asyncore, socket
 
-class Client(asyncore.dispatcher_with):
+class Client(asyncore.dispatcher_with_send):
 
     def __init__(self, host, port, message):
         asyncore.dispatcher.__init__(self)
