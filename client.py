@@ -16,5 +16,5 @@ class Client(asyncore.dispatcher_with):
         print "Received: ", self.recv(1024)
         self.close()
 
-c = Client("", 8080, "Hello, !!!")
+c = Client("nodeA.rningOneNode.cpsmarkets", 8080, "Hello, !!!")
 asyncore.loop()
