@@ -12,6 +12,6 @@ class Server(asyncore.dispatcher):
         print "Server: Connection by ", address
         socket.send(outBuffer)
 
-s = Server("", 8080)
+s = Server("nodeA.rningOneNode.cpsmarkets", 8080)
 asyncore.loop()
     
