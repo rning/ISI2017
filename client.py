@@ -9,12 +9,11 @@ class Client(asyncore.dispatcher):
 
     def handle_close(self):
         print "Client: Connection Closed"
-        self.socket.close()
         self.close()
 
     def handle_read(self):
         print "Received: ", self.recv(1024)
-        self.close()
+        self.handle_close()
 
 add = input("Enter IP address of server in single quotes:\n")
 c = Client(add, 8080)
