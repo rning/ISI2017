@@ -12,7 +12,7 @@ class Server(asyncore.dispatcher_with_send):
     def handle_accept(self):
         socket, address = self.accept()
         print "Server: Connection by ", address
-        socket.send(outBuffer)
+        socket.send(self.outBuffer)
 
 add = input("Enter IP address of server in single quotes:\n")
 s = Server(add, 8080, "Server says hello!!!/n")
