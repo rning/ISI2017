@@ -16,5 +16,6 @@ class Client(asyncore.dispatcher_with_send):
         print "Received: ", self.recv(1024)
         self.close()
 
-c = Client("nodeA.rningOneNode.cpsmarkets", 8080, "Hello, !!!")
+add = input("Enter IP address of server in single quotes:\n")
+c = Client(add, 8080, "Hello, !!!")
 asyncore.loop()
