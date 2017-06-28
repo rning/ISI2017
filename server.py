@@ -4,6 +4,7 @@ class Server(asyncore.dispatcher_with_send):
     def __init__(self, host, port, message):
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.bind((host, port))
         self.listen(1)
         self.outBuffer = message
