@@ -13,8 +13,13 @@ class Server(asyncore.dispatcher_with_send):
         socket, address = self.accept()
         print "Server: Connection by ", address
         socket.send(self.outBuffer)
+    
+    def handle_close(self):
+        print "Server: Closed"
+        self.close()
 
 add = input("Enter IP address of server in single quotes:\n")
 s = Server(add, 8080, "Server says hello!!!")
 asyncore.loop()
-    
+input("Press Any Key To Exit")
+s.handle_close()
