@@ -7,7 +7,7 @@ class Server(asyncore.dispatcher_with_send):
         self.bind((host, port))
         self.listen(1)
         self.outBuffer = message
-        print "Server: Waiting for commection..."
+        print "Server: Waiting for connection..."
 
     def handle_accept(self):
         socket, address = self.accept()
