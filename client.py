@@ -9,6 +9,7 @@ class Client(asyncore.dispatcher):
 
     def handle_close(self):
         print "Client: Connection Closed"
+        self.socket.close()
         self.close()
 
     def handle_read(self):
