@@ -16,6 +16,6 @@ class Server(asyncore.dispatcher_with_send):
         socket.send(self.outBuffer)
 
 add = input("Enter IP address of server in single quotes:\n")
-s = Server(add, 8080, "Server says hello!!!/n")
+s = Server(add, 8080, "Server says hello!!!")
 asyncore.loop()
     
