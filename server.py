@@ -12,6 +12,7 @@ class Server(asyncore.dispatcher):
         print "Server: Connection by ", address
         socket.send(outBuffer)
 
-s = Server("nodeA.rningOneNode.cpsmarkets", 8080)
+add = input("Enter IP address of server in single quotes:\n")
+s = Server(add, 8080)
 asyncore.loop()
     
