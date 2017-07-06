@@ -6,6 +6,7 @@ class Client(asyncore.dispatcher_with_send):
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connect((host, port))
+        message = self.outBuffer
 
     def handle_close(self):
         print "Client: Connection Closed"
