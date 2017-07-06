@@ -19,5 +19,6 @@ class Server(asyncore.dispatcher_with_send):
         self.close()
 
 add = input("Enter IP address of server in single quotes:\n")
-s = Server(add, 8080, "Server says hello!!!")
+s = Server(add, 8080, "Server connected. Send/Receive active.")
+
 asyncore.loop()
