@@ -12,7 +12,7 @@ class Client(asyncore.dispatcher):
         self.close()
 
     def send_packet(self):
-        socket.send() # packet data here
+        socket.send() # packet data here reeeeee
 
     def handle_read(self):
         print "Received: ", self.recv(1024)
