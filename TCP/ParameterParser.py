@@ -3,7 +3,7 @@ parameterVariables = list()
 varDict = dict()
 
 for line in parameters:
-    parameterVariables = line.split(":")
+    parameterVariables = line.split(": ")
     tempVar = parameterVariables[0]
     tempVal = parameterVariables[1].replace("\n", "")
     varDict[tempVar] = tempVal
