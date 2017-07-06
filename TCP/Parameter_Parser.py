@@ -9,3 +9,5 @@ for line in parameters:
     varDict[tempVar] = tempVal
 
 print varDict
+
+# refer to variables with varDict["variableName"]
