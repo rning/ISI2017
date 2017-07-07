@@ -6,7 +6,7 @@ class Client(asyncore.dispatcher_with_send):
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connect((host, port))
-        self.buffer = message
+        self.outBuffer = message
 
     def handle_close(self):
         print "Client: Connection Closed"
@@ -19,10 +19,10 @@ class Client(asyncore.dispatcher_with_send):
         print "Received: ", self.recv(8192)
 
     def writeable(self):
-        return bool(len(self.buffer) > 0)
+        return bool(self.outBuffer)
 
     def handle_write(self):
-        self.send(self.buffer)
+        self.send(self.outBuffer)
 
 add = input("Enter IP address of server in single quotes:\n")
 c = Client(add, 8080, "Test message")

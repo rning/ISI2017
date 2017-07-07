@@ -25,10 +25,10 @@ class Server(asyncore.dispatcher_with_send):
         print "Received: ", self.recv(1024)
 
     def writeable(self):
-        return bool(len(self.buffer) > 0) 
+        return bool(self.outBuffer) 
 
     def handle_write(self):
-        self.send(self.buffer)
+        self.send(self.outBuffer)
 
 add = input("Enter IP address of server in single quotes:\n")
 s = Server(add, 8080, "Server connected. Send/Receive active.")
