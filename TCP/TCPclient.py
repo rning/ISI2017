@@ -7,6 +7,7 @@ class Client(asyncore.dispatcher_with_send):
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connect((host, port))
         self.outBuffer = message
+        self.isConnected = False
 
     def handle_close(self):
         if recv(1024) == 0:
@@ -14,6 +15,10 @@ class Client(asyncore.dispatcher_with_send):
             self.close()
         else:
             self.handle_read()
+
+    def handle_connect(self):
+        print "handle_connect called"
+        self.isConnected = True
 
     def readable(self):
         print "Readable -> True"
@@ -23,8 +28,8 @@ class Client(asyncore.dispatcher_with_send):
         print "Received: ", self.recv(1024)
 
     def writable(self):
-        print "Writable -> True"
-        return bool(self.outBuffer)
+        print "Writable -> : ", bool(self.outBuffer and self.isConnected)
+        return bool(self.outBuffer and self.isConnected)
 
     def handle_write(self):
         print "handle_write sending..."
