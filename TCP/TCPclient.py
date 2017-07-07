@@ -25,7 +25,7 @@ class Client(asyncore.dispatcher_with_send):
 
     def handle_write(self):
         print "handle_write sending..."
-        sent = socket.send(self.outBuffer)
+        sent = self.socket.send(self.outBuffer)
         self.outBuffer = self.outBuffer[sent:]
 
 address = input("Enter IP address of server in single quotes:\n")
