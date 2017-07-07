@@ -19,7 +19,7 @@ class Client(asyncore.dispatcher_with_send):
         print "Received: ", self.recv(1024)
 
     def writeable(self):
-        return bool(self.outBuffer)
+        return bool(len(self.outBuffer) > 0)
 
     def handle_write(self):
         self.send(self.outBuffer)
