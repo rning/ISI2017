@@ -16,7 +16,7 @@ class Server(asyncore.dispatcher_with_send):
     def handle_accept(self):
         socket, address = self.accept()
         print "Server: Connection by ", address
-        #self.send(self.outBuffer)
+        self.send(self.outBuffer)
 
     def readable(self):
         return True
