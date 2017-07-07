@@ -6,7 +6,7 @@ class Server(asyncore.dispatcher_with_send):
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.bind((host, port))
         self.listen(1)
-        self.outBuffer = message
+        self.buffer = message
         print "Server: Waiting for connection..."
 
     def handle_close(self):
@@ -16,7 +16,7 @@ class Server(asyncore.dispatcher_with_send):
     def handle_accept(self):
         socket, address = self.accept()
         print "Server: Connection by ", address
-        #socket.send(self.outBuffer)
+        #self.send(self.outBuffer)
 
     def readable(self):
         return True
@@ -25,10 +25,10 @@ class Server(asyncore.dispatcher_with_send):
         print "Received: ", self.recv(1024)
 
     def writeable(self):
-        return bool(len(self.outBuffer) > 0) # originally this was bool(self.outBuffer), which makes no sense and will always return false.
+        return bool(len(self.buffer) > 0) 
 
     def handle_write(self):
-        self.send(self.outBuffer)
+        self.send(self.buffer)
 
 add = input("Enter IP address of server in single quotes:\n")
 s = Server(add, 8080, "Server connected. Send/Receive active.")
