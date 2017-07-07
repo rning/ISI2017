@@ -25,7 +25,7 @@ class Server(asyncore.dispatcher_with_send):
         print "Received: ", self.recv(1024)
 
     def writeable(self):
-        return bool(self.outBuffer)
+        return bool(len(self.outBuffer) > 0) # originally this was bool(self.outBuffer), which makes no sense and will always return false.
 
     def handle_write(self):
         self.send(self.outBuffer)
