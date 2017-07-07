@@ -10,7 +10,7 @@ class Server(asyncore.dispatcher_with_send):
         print "Server: Waiting for connection..."
 
     def handle_close(self):
-        if recv == 0:
+        if recv(1024) == 0:
             print "Server: Closed"
             self.close()
 
