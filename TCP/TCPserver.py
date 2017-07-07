@@ -27,7 +27,9 @@ class Server(asyncore.dispatcher_with_send):
 
     def writable(self):
         print "Writable -> ", bool(self.outBuffer)
-        return bool(self.outBuffer) 
+        return bool(self.outBuffer)
+        if bool(self.outBuffer) == True:
+            self.handle_write() 
 
     def handle_write(self):
         print "handle_write sending..."
@@ -38,4 +40,3 @@ add = input("Enter IP address of server in single quotes:\n")
 s = Server(add, 8080, "Server connected. Send/Receive active.")
 
 asyncore.loop()
-
