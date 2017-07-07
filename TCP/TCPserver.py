@@ -10,9 +10,8 @@ class Server(asyncore.dispatcher_with_send):
         print "Server: Waiting for connection..."
 
     def handle_close(self):
-        if recv(1024) == 0:
-            print "Server: Closed"
-            self.close()
+        print "Server: Closed"
+        self.close()
 
     def handle_accept(self):
         socket, address = self.accept()
@@ -27,7 +26,8 @@ class Server(asyncore.dispatcher_with_send):
         print "Received: ", self.recv(1024)
 
     def writable(self):
-        return bool(self.outBuffer)
+        print "Writable -> ", bool(self.outBuffer)
+        return bool(self.outBuffer) 
 
     def handle_write(self):
         print "handle_write sending..."
@@ -38,3 +38,4 @@ add = input("Enter IP address of server in single quotes:\n")
 s = Server(add, 8080, "Server connected. Send/Receive active.")
 
 asyncore.loop()
+
