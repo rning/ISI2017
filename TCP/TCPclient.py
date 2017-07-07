@@ -10,11 +10,9 @@ class Client(asyncore.dispatcher_with_send):
         self.isConnected = False
 
     def handle_close(self):
-        if recv(1024) == 0:
-            print "Client: Connection Closed"
-            self.close()
-        else:
-            self.handle_read()
+        print "Client: Connection Closed"
+        self.close()
+
 
     def handle_connect(self):
         print "handle_connect called"
