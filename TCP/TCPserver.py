@@ -19,6 +19,7 @@ class Server(asyncore.dispatcher_with_send):
         self.socket.send(self.outBuffer)
 
     def readable(self):
+        print "Readable -> True"
         return True
 
     def handle_read(self):
@@ -28,6 +29,7 @@ class Server(asyncore.dispatcher_with_send):
         return bool(self.outBuffer) 
 
     def handle_write(self):
+        print "handle_write sending..."
         self.socket.send(self.outBuffer)
 
 add = input("Enter IP address of server in single quotes:\n")
