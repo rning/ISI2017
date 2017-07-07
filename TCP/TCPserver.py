@@ -25,7 +25,7 @@ class Server(asyncore.dispatcher_with_send):
     def handle_read(self):
         print "Received: ", self.recv(1024)
 
-    def writeable(self):
+    def writable(self):
         return bool(self.outBuffer) 
 
     def handle_write(self):
