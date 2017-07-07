@@ -16,7 +16,7 @@ class Server(asyncore.dispatcher_with_send):
     def handle_accept(self):
         socket, address = self.accept()
         print "Server: Connection by ", address
-        socket.send(self.outBuffer)
+        self.socket.send(self.outBuffer)
 
     def readable(self):
         return True
@@ -28,7 +28,7 @@ class Server(asyncore.dispatcher_with_send):
         return bool(self.outBuffer) 
 
     def handle_write(self):
-        socket.send(self.outBuffer)
+        self.socket.send(self.outBuffer)
 
 add = input("Enter IP address of server in single quotes:\n")
 s = Server(add, 8080, "Server connected. Send/Receive active.")
