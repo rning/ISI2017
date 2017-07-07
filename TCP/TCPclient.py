@@ -9,8 +9,11 @@ class Client(asyncore.dispatcher_with_send):
         self.outBuffer = message
 
     def handle_close(self):
-        print "Client: Connection Closed"
-        self.close()
+        if recv(1024) == 0:
+            print "Client: Connection Closed"
+            self.close()
+        else:
+            self.handle_read()
 
     def readable(self):
         print "Readable -> True"
