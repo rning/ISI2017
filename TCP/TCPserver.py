@@ -6,7 +6,7 @@ class Server(asyncore.dispatcher_with_send):
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.bind((host, port))
         self.listen(1)
-        self.buffer = message
+        self.outBuffer = message
         print "Server: Waiting for connection..."
 
     def handle_close(self):
