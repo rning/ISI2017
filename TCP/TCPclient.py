@@ -13,7 +13,6 @@ class Client(asyncore.dispatcher_with_send):
         print "Client: Connection Closed"
         self.close()
 
-
     def handle_connect(self):
         print "handle_connect called"
         self.isConnected = True
@@ -26,7 +25,7 @@ class Client(asyncore.dispatcher_with_send):
         print "Received: ", self.recv(1024)
 
     def writable(self):
-        print "Writable -> : ", bool(self.outBuffer and self.isConnected)
+        print "Writable -> ", bool(self.outBuffer and self.isConnected)
         return bool(self.outBuffer and self.isConnected)
 
     def handle_write(self):
