@@ -10,6 +10,8 @@ class Server(asyncore.dispatcher_with_send):
         print "Server: Waiting for connection..."
 
     def handle_close(self):
+        while self.writable():
+            self.handle_write()
         print "Server: Closed"
         self.close()
 
@@ -18,6 +20,7 @@ class Server(asyncore.dispatcher_with_send):
         print "Server: Connection by ", address
         socket.send(self.outBuffer)
 
+        
     def readable(self):
         print "Readable -> True"
         return True
@@ -28,14 +31,15 @@ class Server(asyncore.dispatcher_with_send):
     def writable(self):
         print "Writable -> ", bool(self.outBuffer)
         return bool(self.outBuffer)
-        if bool(self.outBuffer) == True:
-            self.handle_write() 
 
     def handle_write(self):
         print "handle_write sending..."
         sent = self.socket.send(self.outBuffer)
         self.outBuffer = self.outBuffer[sent:]
-
+    
+    def change_data(self, data):
+        self.outBuffer += data # add more data rather than using socket.send by itself and let handle_write handle it
+        
 add = input("Enter IP address of server in single quotes:\n")
 s = Server(add, 8080, "Server connected. Send/Receive active.")
 
