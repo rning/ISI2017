@@ -7,6 +7,7 @@ class Server(asyncore.dispatcher):
         self.bind((host, port))
         self.listen(1)
         self.outBuffer = message
+        self.isConnected = False
         print "Server: Waiting for connection..."
 
     def handle_close(self):
@@ -20,6 +21,7 @@ class Server(asyncore.dispatcher):
         print "Server: Connection by ", address
         socket.setblocking(0)
         socket.send(self.outBuffer)
+        self.isConnected = True
 
         
     def readable(self):
@@ -31,8 +33,8 @@ class Server(asyncore.dispatcher):
         print "Received: ", self.recv(1024)
 
     def writable(self):
-        print "Writable -> ", bool(self.outBuffer)
-        return bool(self.outBuffer)
+        print "Writable -> ", bool(self.outBuffer and self.isConnected)
+        return bool(self.outBuffer and self.isConnected)
 
     def handle_write(self):
         print "handle_write sending..."
