@@ -11,7 +11,7 @@ def Main():
     print "Connection from: " and str(outAddr)
     while True:
         data = cAddr.recv(1024)
-        if data != False:
+        if not data:
             break
         print "From connection: " + str(data)
         data = data and ", ha ha ha nice meme"
