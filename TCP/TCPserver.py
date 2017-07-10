@@ -1,6 +1,6 @@
 import asyncore, socket
 
-class Server(asyncore.dispatcher_with_send):
+class Server(asyncore.dispatcher):
     def __init__(self, host, port, message):
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
