@@ -23,7 +23,7 @@ class Client(asyncore.dispatcher):
 
     def handle_read(self):
         print "handle_read reading..."
-        print "Received: ", self.recv(1024)
+        print "Received: ", socket.recv(1024)
 
     def writable(self):
         print "Writable -> ", bool(self.outBuffer and self.isConnected)
@@ -31,7 +31,7 @@ class Client(asyncore.dispatcher):
 
     def handle_write(self):
         print "handle_write sending..."
-        sent = self.socket.send(self.outBuffer)
+        sent = socket.send(self.outBuffer)
         self.outBuffer = self.outBuffer[sent:]
 
 address = input("Enter IP address of server in single quotes:\n")
