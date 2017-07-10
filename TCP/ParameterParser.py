@@ -8,6 +8,6 @@ for line in parameters:
     tempVal = parameterVariables[1].replace("\n", "")
     varDict[tempVar] = tempVal
 
-print varDict
+# print varDict - debug to see if variable dictionary is working
 
 # refer to variables with varDict["variableName"]
