@@ -22,7 +22,7 @@ class Client(asyncore.dispatcher):
         return True
 
     def handle_read(self):
-        pring "handle_read reading..."
+        print "handle_read reading..."
         print "Received: ", self.recv(1024)
 
     def writable(self):
