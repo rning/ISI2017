@@ -18,6 +18,7 @@ class Server(asyncore.dispatcher):
     def handle_accept(self):
         socket, address = self.accept()
         print "Server: Connection by ", address
+        socket.setblocking(0)
         socket.send(self.outBuffer)
 
         
@@ -38,8 +39,8 @@ class Server(asyncore.dispatcher):
         sent = self.socket.send(self.outBuffer)
         self.outBuffer = self.outBuffer[sent:]
     
-    def change_data(self, data):
-        self.outBuffer += data # add more data rather than using socket.send by itself and let handle_write handle it
+#    def change_data(self, data):
+#        self.outBuffer += data # add more data rather than using socket.send by itself and let handle_write handle it
         
 add = input("Enter IP address of server in single quotes:\n")
 s = Server(add, 8080, "Server connected. Send/Receive active.")
