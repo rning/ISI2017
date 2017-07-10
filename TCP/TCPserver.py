@@ -15,10 +15,10 @@ class Server(asyncore.dispatcher):
         self.close()
 
     def handle_accept(self):
-        socket, address = self.accept()
+        self.sock, self.address = self.accept()
         print "Server: Connection by ", address
-        socket.setblocking(0)
-        socket.send(self.outBuffer)
+        self.sock.setblocking(0)
+        self.sock.send(self.outBuffer)
         self.isConnected = True
         
     def readable(self):
@@ -27,7 +27,7 @@ class Server(asyncore.dispatcher):
 
     def handle_read(self):
         print "handle_read reading..."
-        print "Received: ", socket.recv(1024)
+        print "Received: ", self.sock.recv(1024)
 
     def writable(self):
         print "Writable -> ", bool(self.outBuffer and self.isConnected)
@@ -35,7 +35,7 @@ class Server(asyncore.dispatcher):
 
     def handle_write(self):
         print "handle_write sending..."
-        sent = socket.send(self.outBuffer)
+        sent = self.sock.send(self.outBuffer)
         self.outBuffer = self.outBuffer[sent:]
     
 #    def change_data(self, data):
