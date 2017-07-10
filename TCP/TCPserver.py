@@ -1,6 +1,7 @@
 import asyncore, socket
 
 class Server(asyncore.dispatcher):
+
     def __init__(self, host, port, message):
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -22,27 +23,6 @@ class Server(asyncore.dispatcher):
         self.isConnected = True
 
         EchoServer(self.sock)
-"""        
-    def readable(self):
-        print "Readable -> True"
-        return True
-
-    def handle_read(self):
-        print "handle_read reading..."
-        print "Received: ", self.sock.recv(1024)
-
-    def writable(self):
-        print "Writable -> ", bool(self.outBuffer and self.isConnected)
-        return bool(self.outBuffer and self.isConnected)
-
-    def handle_write(self):
-        print "handle_write sending..."
-        sent = self.sock.send(self.outBuffer)
-        self.outBuffer = self.outBuffer[sent:]
-    
-#    def change_data(self, data):
-#        self.outBuffer += data # add more data rather than using socket.send by itself and let handle_write handle it
-"""
 
 class EchoServer(asyncore.dispatcher):
 
