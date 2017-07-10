@@ -26,6 +26,7 @@ class Server(asyncore.dispatcher):
         return True
 
     def handle_read(self):
+        print "handle_read reading..."
         print "Received: ", self.recv(1024)
 
     def writable(self):
