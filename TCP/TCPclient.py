@@ -34,6 +34,9 @@ class Client(asyncore.dispatcher):
         sent = self.send(self.outBuffer)
         self.outBuffer = self.outBuffer[sent:]
 
-address = input("Enter IP address of server in single quotes:\n")
-c = Client(address, 8080, "Test message")
-asyncore.loop()
+if __name__ == '__main__':
+
+    address = input("Enter IP address of server in single quotes:\n")
+    c = Client(address, 8080, "Test message")
+
+    asyncore.loop()

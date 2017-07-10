@@ -8,7 +8,6 @@ class Server(asyncore.dispatcher):
         self.bind((host, port))
         self.listen(5)
         self.outBuffer = message
-        self.isConnected = False
         print "Server: Waiting for connection..."
 
     def handle_close(self):
@@ -20,8 +19,6 @@ class Server(asyncore.dispatcher):
         print "Server: Connection by ", self.address
         self.sock.setblocking(0)
         self.sock.send(self.outBuffer)
-        self.isConnected = True
-
         EchoServer(self.sock)
 
 class EchoServer(asyncore.dispatcher):
@@ -47,7 +44,9 @@ class EchoServer(asyncore.dispatcher):
         sent = self.send(self.outBuffer)
         self.outBuffer = self.outBuffer[sent:]
 
-add = input("Enter IP address of server in single quotes:\n")
-s = Server(add, 8080, "Server connected. Send/Receive active.")
+if __name__ == '__main__':
 
-asyncore.loop()
+    add = input("Enter IP address of server in single quotes:\n")
+    s = Server(add, 8080, "Server connected. Send/Receive active.")
+
+    asyncore.loop()
