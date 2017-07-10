@@ -16,7 +16,7 @@ class Server(asyncore.dispatcher):
 
     def handle_accept(self):
         self.sock, self.address = self.accept()
-        print "Server: Connection by ", address
+        print "Server: Connection by ", self.address
         self.sock.setblocking(0)
         self.sock.send(self.outBuffer)
         self.isConnected = True
