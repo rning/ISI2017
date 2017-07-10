@@ -5,7 +5,7 @@ class Server(asyncore.dispatcher):
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.bind((host, port))
-        self.listen(1)
+        self.listen(5)
         self.outBuffer = message
         self.isConnected = False
         print "Server: Waiting for connection..."
