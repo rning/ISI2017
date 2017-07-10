@@ -20,7 +20,9 @@ class Server(asyncore.dispatcher):
         self.sock.setblocking(0)
         self.sock.send(self.outBuffer)
         self.isConnected = True
-        
+
+        EchoServer(self.sock)
+"""        
     def readable(self):
         print "Readable -> True"
         return True
@@ -40,7 +42,31 @@ class Server(asyncore.dispatcher):
     
 #    def change_data(self, data):
 #        self.outBuffer += data # add more data rather than using socket.send by itself and let handle_write handle it
-        
+"""
+
+class EchoServer(asyncore.dispatcher):
+
+    def __init__(self, sock):
+        asyncore.dispatcher.__init__(self, sock=sock)
+        self.outBuffer = "testbufferwhodis"
+
+    def readable(self):
+        print "Readable -> True"
+        return True
+
+    def handle_read(self):
+        print "handle_read reading..."
+        print "Received: ", self.recv(1024)
+
+    def writable(self):
+        print "Writable -> ", bool(self.outBuffer)
+        return bool(self.outBuffer)
+
+    def handle_write(self):
+        print "handle_write sending..."
+        sent = self.send(self.outBuffer)
+        self.outBuffer = self.outBuffer[sent:]
+
 add = input("Enter IP address of server in single quotes:\n")
 s = Server(add, 8080, "Server connected. Send/Receive active.")
 
