@@ -1,9 +1,9 @@
 import asyncore, socket
 from ParameterParser import *
 
-def incrementData(data, factor, initcwnd=10, recentACK=1):
+def incrementData(data, factor, initcwnd=10, recentACK=0):
     # WIP, assumed that this is the first send, increment
-    ackNum = recentACK
+    ackNum = recentACK + 1
     incrementAmt = initcwnd ** ackNum # raise the initial amount to the most recent sent ACK
     data = data * incrementAmt # multiply the string by that amount to simulate multiple packets
     return data
