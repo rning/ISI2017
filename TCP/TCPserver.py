@@ -20,7 +20,7 @@ class Server(asyncore.dispatcher):
         print "Server: Connection by ", self.address
         self.sock.setblocking(0)
         self.sock.send(self.outBuffer)
-        EchoServer(self.sock)
+        EchoServer(self.sock) #this would be es = EchoServer(self.sock)
 
 class EchoServer(asyncore.dispatcher):
 
@@ -51,3 +51,5 @@ if __name__ == '__main__':
     s = Server(add, 8080, "Server connected. Send/Receive active.")
 
     asyncore.loop()
+
+# s.es.outBuffer to reference EchoServer's outBuffer
