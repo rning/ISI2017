@@ -50,4 +50,4 @@ if __name__ == '__main__':
     add = input("Enter IP address of server in single quotes:\n")
     s = Server(add, 8080, "Server connected. Send/Receive active.")
 
-    asyncore.loop()
+    asyncore.loop(0, False, None)
