@@ -1,6 +1,0 @@
-data: data
-packetSize: ree
-windowSize: ree
-slowstartFactor: ree
-initialPackets: ree
-sampleRTT: ree
