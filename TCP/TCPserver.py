@@ -1,6 +1,13 @@
 import asyncore, socket
 from ParameterParser import *
 
+def incrementData(data, factor, initcwnd=10, recentACK=1):
+    # WIP, assumed that this is the first send, increment
+    ackNum = recentACK
+    incrementAmt = initcwnd ** ackNum # raise the initial amount to the most recent sent ACK
+    data = data * incrementAmt # multiply the string by that amount to simulate multiple packets
+    return data
+
 class Server(asyncore.dispatcher):
 
     def __init__(self, host, port, message):
