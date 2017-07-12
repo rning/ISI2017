@@ -24,6 +24,10 @@ class Client(asyncore.dispatcher):
 
     def handle_read(self):
         print "handle_read reading..."
+
+        #unpack structure sent from server: [pack seq, ack seq, data]
+        #if 
+        
         print "Received: ", self.recv(1024)
 
     def writable(self):

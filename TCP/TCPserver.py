@@ -19,7 +19,7 @@ class Server(asyncore.dispatcher):
         self.sock, self.address = self.accept()
         print "Server: Connection by ", self.address
         self.sock.setblocking(0)
-        self.sock.send(self.outBuffer)
+        #self.sock.send(self.outBuffer) #delete this once packet structure is implemented (client expects packet)
         EchoServer(self.sock)
 
 class EchoServer(asyncore.dispatcher):
@@ -34,6 +34,11 @@ class EchoServer(asyncore.dispatcher):
 
     def handle_read(self):
         print "handle_read reading..."
+
+        #unpack structure sent from client: [pack seq, ack seq, data]
+        #if pack sequence is 1 (should always be true as nothing else sent), set data as packReq
+        #else if pack sequence is 0(empty) and ack sequence >= 1, increment ACK appropriately
+        
         print "Received: ", self.recv(1024)
 
     def writable(self):
