@@ -1,13 +1,13 @@
 import asyncore, socket
-from ParameterParser import *
+#from ParameterParser import *
 
 class Client(asyncore.dispatcher):
 
-    def __init__(self, host, port, message):
+    def __init__(self, host, port, packReq):
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connect((host, port))
-        self.outBuffer = message
+        self.outBuffer = packReq
         self.isConnected = False
 
     def handle_close(self):
@@ -38,6 +38,6 @@ class Client(asyncore.dispatcher):
 if __name__ == '__main__':
 
     address = input("Enter IP address of server in single quotes:\n")
-    c = Client(address, 8080, "Test message")
+    c = Client(address, 8080, "Client: packReq")
 
     asyncore.loop()
