@@ -26,7 +26,8 @@ class Client(asyncore.dispatcher):
         print "handle_read reading..."
 
         #unpack structure sent from server: [pack seq, ack seq, data]
-        #if 
+        #increment ACK based on receieved pack seq
+        #send ACK immediately for each pack recieved
         
         print "Received: ", self.recv(1024)
 

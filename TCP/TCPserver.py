@@ -26,7 +26,7 @@ class EchoServer(asyncore.dispatcher):
 
     def __init__(self, sock): #packreq
         asyncore.dispatcher.__init__(self, sock=sock)
-        self.outBuffer = "testbufferwhodis"
+        self.outBuffer = "testbufferwhodis" #
 
     def readable(self):
         print "Readable -> True"
@@ -36,8 +36,9 @@ class EchoServer(asyncore.dispatcher):
         print "handle_read reading..."
 
         #unpack structure sent from client: [pack seq, ack seq, data]
-        #if pack sequence is 1 (should always be true as nothing else sent), set data as packReq
+        #if pack sequence and ack sequence is 0 (empty), set data as packReq
         #else if pack sequence is 0(empty) and ack sequence >= 1, increment ACK appropriately
+        #note: pack sequence not necessarily required for packets sent to server
         
         print "Received: ", self.recv(1024)
 
