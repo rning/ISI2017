@@ -27,6 +27,7 @@ class EchoServer(asyncore.dispatcher):
     def __init__(self, sock):
         asyncore.dispatcher.__init__(self, sock=sock)
         self.packReq = 0
+        self.ackSeq = 0
         self.outBuffer = "testbufferwhodis" #
 
     def readable(self):
@@ -36,18 +37,15 @@ class EchoServer(asyncore.dispatcher):
     def handle_read(self):
         print "handle_read reading..."
 
-        #unpack structure received from client: [pack seq, ack seq, data]
-        recPack = struct.unpack('LLL', self.recv(4096)) #size: 12 bytes
+        #unpack structure received from client: [ack seq]
+        recPack = struct.unpack('LL', self.recv(4096)) #size: 8 bytes
         
         #if pack sequence and ack sequence is 0 (empty), set data as packReq
         #else if pack sequence is 0(empty) and ack sequence >= 1, increment ACK appropriately
-        if recPack[1] == 0:
-            self.packReq = recPack[2]
-        else:
-            #increment ACK appropriately
-        #note: pack seq not necessarily required for packets sent to server, but kept for consistent format
-        
-        print "Received: ", self.recv(4096)
+        if recPack[0] == (self.ackSeq + 1):
+            self.ackSeq += 1
+        else if recPack[0] == 0:
+            self.packReq = recPack[1]
 
     def writable(self):
         print "Writable -> ", bool(self.packReq)

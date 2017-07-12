@@ -8,6 +8,7 @@ class Client(asyncore.dispatcher):
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connect((host, port))
         self.outBuffer = packReq
+        self.packSeq = 0
         self.isConnected = False
 
     def handle_close(self):
@@ -25,15 +26,14 @@ class Client(asyncore.dispatcher):
     def handle_read(self):
         print "handle_read reading..."
 
-        #unpack structure sent from server: [pack seq, ack seq, data]
-        recPack = struct.unpack('LLL', self.recv(4096)) #size: 12 bytes
+        #unpack structure sent from server: [pack seq, data (should be large # of bytes)]
+        recPack = struct.unpack('L60s', self.recv(4096)) #size: 64 bytes
         
         #increment ACK based on receieved pack seq
-        
         #send ACK immediately for each pack recieved (presumably within handle_read, but maybe with handle_write)
-        
-        
-        print "Received: ", self.recv(4096)
+        if recPack[0] == (self.packSeq + 1):
+            self.packSeq += 1
+            #send here or in handle_wirte?
 
     def writable(self):
         print "Writable -> ", bool(self.outBuffer and self.isConnected)
