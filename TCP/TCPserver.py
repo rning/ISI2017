@@ -1,9 +1,9 @@
-import asyncore, socket
+import asyncore, socket, struct
 #from ParameterParser import *
 
 class Server(asyncore.dispatcher):
 
-    def __init__(self, host, port, message):
+    def __init__(self, host, port, message): #don't need message
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.bind((host, port))
@@ -24,8 +24,9 @@ class Server(asyncore.dispatcher):
 
 class EchoServer(asyncore.dispatcher):
 
-    def __init__(self, sock): #packreq
+    def __init__(self, sock):
         asyncore.dispatcher.__init__(self, sock=sock)
+        self.packReq = 0
         self.outBuffer = "testbufferwhodis" #
 
     def readable(self):
@@ -35,16 +36,22 @@ class EchoServer(asyncore.dispatcher):
     def handle_read(self):
         print "handle_read reading..."
 
-        #unpack structure sent from client: [pack seq, ack seq, data]
+        #unpack structure received from client: [pack seq, ack seq, data]
+        recPack = struct.unpack('LLL', self.recv(4096)) #size: 12 bytes
+        
         #if pack sequence and ack sequence is 0 (empty), set data as packReq
         #else if pack sequence is 0(empty) and ack sequence >= 1, increment ACK appropriately
-        #note: pack sequence not necessarily required for packets sent to server
+        if recPack[1] == 0:
+            self.packReq = recPack[2]
+        else:
+            #increment ACK appropriately
+        #note: pack seq not necessarily required for packets sent to server, but kept for consistent format
         
-        print "Received: ", self.recv(1024)
+        print "Received: ", self.recv(4096)
 
     def writable(self):
-        print "Writable -> ", bool(self.outBuffer)
-        return bool(self.outBuffer)
+        print "Writable -> ", bool(self.packReq)
+        return bool(self.packReq)
 
     def handle_write(self):
         print "handle_write sending..."

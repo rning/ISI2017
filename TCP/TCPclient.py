@@ -1,4 +1,4 @@
-import asyncore, socket
+import asyncore, socket, struct
 #from ParameterParser import *
 
 class Client(asyncore.dispatcher):
@@ -26,10 +26,14 @@ class Client(asyncore.dispatcher):
         print "handle_read reading..."
 
         #unpack structure sent from server: [pack seq, ack seq, data]
-        #increment ACK based on receieved pack seq
-        #send ACK immediately for each pack recieved
+        recPack = struct.unpack('LLL', self.recv(4096)) #size: 12 bytes
         
-        print "Received: ", self.recv(1024)
+        #increment ACK based on receieved pack seq
+        
+        #send ACK immediately for each pack recieved (presumably within handle_read, but maybe with handle_write)
+        
+        
+        print "Received: ", self.recv(4096)
 
     def writable(self):
         print "Writable -> ", bool(self.outBuffer and self.isConnected)
