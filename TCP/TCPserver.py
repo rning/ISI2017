@@ -24,7 +24,7 @@ class Server(asyncore.dispatcher):
 
 class EchoServer(asyncore.dispatcher):
 
-    def __init__(self, sock):
+    def __init__(self, sock): #packreq
         asyncore.dispatcher.__init__(self, sock=sock)
         self.outBuffer = "testbufferwhodis"
 
@@ -42,6 +42,9 @@ class EchoServer(asyncore.dispatcher):
 
     def handle_write(self):
         print "handle_write sending..."
+
+        #for loop to send sequence (one group) of packets
+        
         sent = self.send(self.outBuffer)
         self.outBuffer = self.outBuffer[sent:]
 
@@ -50,4 +53,4 @@ if __name__ == '__main__':
     add = input("Enter IP address of server in single quotes:\n")
     s = Server(add, 8080, "Server connected. Send/Receive active.")
 
-    asyncore.loop(0, False, None)
+    asyncore.loop() #(0)
