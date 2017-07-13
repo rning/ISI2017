@@ -3,12 +3,11 @@ import asyncore, socket, struct
 
 class Server(asyncore.dispatcher):
 
-    def __init__(self, host, port, message): #don't need message
+    def __init__(self, host, port): #don't need message
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.bind((host, port))
         self.listen(5)
-        self.outBuffer = message
         print "Server: Waiting for connection..."
 
     def handle_close(self):
@@ -56,14 +55,15 @@ class EchoServer(asyncore.dispatcher):
     def handle_write(self):
         print "handle_write sending..."
 
+        #testing
+        self.send(struct.pack('L60s', 1, ''))
+
         #for loop to send sequence (one group) of packets
         
-        sent = self.send(self.outBuffer)
-        self.outBuffer = self.outBuffer[sent:]
 
 if __name__ == '__main__':
 
     add = input("Enter IP address of server in single quotes:\n")
-    s = Server(add, 8080, "Server connected. Send/Receive active.")
+    s = Server(add, 8080)
 
     asyncore.loop() #(0)
