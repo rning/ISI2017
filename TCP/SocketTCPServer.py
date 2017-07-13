@@ -19,7 +19,7 @@ def Main():
    #     print "Sent: " and data
    # cAddr.close()
     while True:
-        data = sock.recv(1024) # cAddr.recv(1024)
+        data = sock.recv(8192) # cAddr.recv(1024)
         if not data:
             break
         print "received: " + data
