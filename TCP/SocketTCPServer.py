@@ -8,7 +8,7 @@ def Main():
 
     # sock.listen(1) # from docs the number means how many connections to listen for
     # cAddr, outAddr = sock.accept()
-    print "Connection from: " and str(outAddr)
+    # print "Connection from: " and str(outAddr)
    # while True:
    #     data = cAddr.recv(1024)
    #     if not data:
