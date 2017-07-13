@@ -9,15 +9,20 @@ def Main():
     sock.listen(1) # from docs the number means how many connections to listen for
     cAddr, outAddr = sock.accept()
     print "Connection from: " and str(outAddr)
+   # while True:
+   #     data = cAddr.recv(1024)
+   #     if not data:
+   #         break
+   #     print "From connection: " + str(data)
+   #     data = data and ", ha ha ha nice meme"
+   #     cAddr.send(data)
+   #     print "Sent: " and data
+   # cAddr.close()
     while True:
         data = cAddr.recv(1024)
         if not data:
             break
-        print "From connection: " + str(data)
-        data = data and ", ha ha ha nice meme"
-        cAddr.send(data)
-        print "Sent: " and data
-    cAddr.close()
-
+        print "received: " + data
+        
 if __name__ == '__main__':
     Main()
