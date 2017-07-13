@@ -29,6 +29,7 @@ class EchoServer(asyncore.dispatcher):
         self.ackSeq = 0
         self.canWrite = False
         self.outBuffer = "testbufferwhodis" #
+        self.packetController()
 
     def readable(self):
         print "Readable -> True"
@@ -61,8 +62,8 @@ class EchoServer(asyncore.dispatcher):
 
         #for loop to send sequence (one group) of packets
 
-    #def checkCanWrite(self):
-        
+    def packetController(self):
+        print "testcall"
 
 if __name__ == '__main__':
 
