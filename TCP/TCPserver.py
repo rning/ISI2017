@@ -50,6 +50,8 @@ class EchoServer(asyncore.dispatcher):
         elif recPack[0] == 0:
             self.packReq = recPack[1]
 
+        #call packetController (?)
+
         #need timeout somewhere for when to send/resend (send when all acks return, resend when timeout)
 
     def writable(self):
@@ -64,7 +66,6 @@ class EchoServer(asyncore.dispatcher):
             self.send(struct.pack('L60s', (self.ackSeq + i), ''))
 
         self.canWrite = False
-        self.packetController()
 
     def packetController(self):
         print "packetController called"
