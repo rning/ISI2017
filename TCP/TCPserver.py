@@ -1,4 +1,4 @@
-import asyncore, socket, struct
+import asyncore, socket, struct, time
 #from ParameterParser import *
 
 class Server(asyncore.dispatcher):
@@ -31,8 +31,10 @@ class EchoServer(asyncore.dispatcher):
         self.outBuffer = "testbufferwhodis" #
 
         self.cwnd = 1
-        self.timeOut = #{time}
-        self.packetController()
+        self.timeoutTime = 5 #time in seconds
+        self.startTime = None
+        self.acksReceived = False
+        self.packController()
 
     def readable(self):
         print "Readable -> True"
@@ -48,6 +50,7 @@ class EchoServer(asyncore.dispatcher):
         #else if pack sequence is 0(empty) and ack sequence >= 1, increment ACK appropriately
         if recPack[0] == (self.ackSeq + 1):
             self.ackSeq += 1
+            #
         elif recPack[0] == 0:
             self.packReq = recPack[1]
 
@@ -62,14 +65,26 @@ class EchoServer(asyncore.dispatcher):
     def handle_write(self):
         print "handle_write sending..."
 
+        #set startTime as current time (for timeout purposes)
+
         #for loop to send one group of cwnd# of packets
         for i in range(1, (self.cwnd + 1)):
             self.send(struct.pack('L60s', (self.ackSeq + i), ''))
 
-        self.canWrite = False
-
-    def packetController(self):
+        self.startTime = time.time()
+        self.canWrite = False 
+        self.packController()
+        
+    
+    def packController(self):
         print "packetController called"
+
+        #pause with while loop (conditionals: compare startTime to current, all acks received)
+        while self.startTime + self.timeoutTime > time.time() or self.acksReceived:
+            pass
+
+        #check whether or not acks received, then take appropriate action
+        #(send next group with increased cwnd OR retransmit from last+1 acked packet)
         
 
 if __name__ == '__main__':
