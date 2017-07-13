@@ -7,7 +7,7 @@ def Main():
     sock.bind((ipaddr, port))
 
     # sock.listen(1) # from docs the number means how many connections to listen for
-    cAddr, outAddr = sock.accept()
+    # cAddr, outAddr = sock.accept()
     print "Connection from: " and str(outAddr)
    # while True:
    #     data = cAddr.recv(1024)
@@ -19,7 +19,7 @@ def Main():
    #     print "Sent: " and data
    # cAddr.close()
     while True:
-        data = cAddr.recv(1024)
+        data = sock.recv(1024) # cAddr.recv(1024)
         if not data:
             break
         print "received: " + data
