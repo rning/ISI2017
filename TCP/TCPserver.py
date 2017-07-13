@@ -19,7 +19,7 @@ class Server(asyncore.dispatcher):
         self.sock, self.address = self.accept()
         print "Server: Connection by ", self.address
         self.sock.setblocking(0)
-        #self.sock.send(self.outBuffer) #delete this once packet structure is implemented (client expects packet)
+        self.sock.send(struct.pack('L60s', 0, '')) #sends empty packet to trigger Client handle_connect
         EchoServer(self.sock)
 
 class EchoServer(asyncore.dispatcher):
@@ -44,7 +44,7 @@ class EchoServer(asyncore.dispatcher):
         #else if pack sequence is 0(empty) and ack sequence >= 1, increment ACK appropriately
         if recPack[0] == (self.ackSeq + 1):
             self.ackSeq += 1
-        else if recPack[0] == 0:
+        elif recPack[0] == 0:
             self.packReq = recPack[1]
 
         #need timeout somewhere for when to send/resend (send when all acks return, resend when timeout)

@@ -19,7 +19,7 @@ class Client(asyncore.dispatcher):
     def handle_connect(self): #sends packReq
         print "handle_connect called"
         self.isConnected = True
-        self.send(struct.pack('LL', 0, packReq))
+        self.send(struct.pack('LL', 0, self.packReq))
 
     def readable(self):
         print "Readable -> True"
