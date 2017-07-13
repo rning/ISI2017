@@ -27,6 +27,7 @@ class EchoServer(asyncore.dispatcher):
         asyncore.dispatcher.__init__(self, sock=sock)
         self.packReq = 0
         self.ackSeq = 0
+        self.canWrite = False
         self.outBuffer = "testbufferwhodis" #
 
     def readable(self):
@@ -49,8 +50,8 @@ class EchoServer(asyncore.dispatcher):
         #need timeout somewhere for when to send/resend (send when all acks return, resend when timeout)
 
     def writable(self):
-        print "Writable -> ", bool(self.packReq)
-        return bool(self.packReq)
+        print "Writable -> ", bool(self.packReq and self.canWrite)
+        return bool(self.packReq and self.canWrite)
 
     def handle_write(self):
         print "handle_write sending..."
@@ -59,6 +60,8 @@ class EchoServer(asyncore.dispatcher):
         self.send(struct.pack('L60s', 1, ''))
 
         #for loop to send sequence (one group) of packets
+
+    #def checkCanWrite(self):
         
 
 if __name__ == '__main__':
