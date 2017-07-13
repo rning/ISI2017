@@ -60,7 +60,7 @@ class EchoServer(asyncore.dispatcher):
         print "handle_write sending..."
 
         #for loop to send one group of cwnd# of packets
-        for i in self.cwnd:
+        for i in range(1, (self.cwnd + 1)):
             self.send(struct.pack('L60s', (self.ackSeq + i), ''))
 
         self.canWrite = False
