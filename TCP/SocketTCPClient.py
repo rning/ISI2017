@@ -1,6 +1,6 @@
 import socket
 
-def Main()
+def Main():
     ipaddr = raw_input('Type the IP belown')
     port = 8080
 
