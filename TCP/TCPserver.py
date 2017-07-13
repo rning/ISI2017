@@ -83,8 +83,11 @@ class EchoServer(asyncore.dispatcher):
         while self.startTime + self.timeoutTime > time.time() or self.acksReceived:
             pass
 
-        #check whether or not acks received, then take appropriate action
-        #(send next group with increased cwnd OR retransmit from last+1 acked packet)
+        if acksReceived:
+            #increase cwnd then send
+
+        else
+            #retransmit
         
 
 if __name__ == '__main__':
