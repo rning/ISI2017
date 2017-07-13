@@ -15,7 +15,7 @@ def Main():
    #     print received from ur ex  and str(received)
    #     message = raw_input(gimme more stuff to sendn)
    # sock.close()
-    data = struct.pack('4000s', 'OVERLOAD ME S..')
+    data = struct.pack('8000s', 'OVERLOAD ME S..')
     while True:
         sock.send(data)
 
