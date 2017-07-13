@@ -67,7 +67,7 @@ class EchoServer(asyncore.dispatcher):
         self.packetController()
 
     def packetController(self):
-        
+        print "packetController called"
 
 if __name__ == '__main__':
 
