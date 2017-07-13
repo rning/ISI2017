@@ -26,11 +26,12 @@ class EchoServer(asyncore.dispatcher):
     def __init__(self, sock):
         asyncore.dispatcher.__init__(self, sock=sock)
         self.packReq = 0
-        self.ackSeq = 0
+        self.ackSeq = 0 # note to add parameters
         self.canWrite = True
         self.outBuffer = "testbufferwhodis" #
 
         self.cwnd = 1
+        self.timeOut = #{time}
         self.packetController()
 
     def readable(self):
@@ -69,6 +70,7 @@ class EchoServer(asyncore.dispatcher):
 
     def packetController(self):
         print "packetController called"
+        
 
 if __name__ == '__main__':
 
