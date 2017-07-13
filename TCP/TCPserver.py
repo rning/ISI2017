@@ -27,8 +27,10 @@ class EchoServer(asyncore.dispatcher):
         asyncore.dispatcher.__init__(self, sock=sock)
         self.packReq = 0
         self.ackSeq = 0
-        self.canWrite = False
+        self.canWrite = True
         self.outBuffer = "testbufferwhodis" #
+
+        self.cwnd = 1
         self.packetController()
 
     def readable(self):
@@ -57,13 +59,15 @@ class EchoServer(asyncore.dispatcher):
     def handle_write(self):
         print "handle_write sending..."
 
-        #testing
-        self.send(struct.pack('L60s', 1, ''))
+        #for loop to send one group of cwnd# of packets
+        for i in self.cwnd:
+            self.send(struct.pack('L60s', (self.ackSeq + i), ''))
 
-        #for loop to send sequence (one group) of packets
+        self.canWrite = False
+        self.packetController()
 
     def packetController(self):
-        print "testcall"
+        
 
 if __name__ == '__main__':
 

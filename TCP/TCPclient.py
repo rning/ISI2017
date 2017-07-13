@@ -35,13 +35,13 @@ class Client(asyncore.dispatcher):
         #send ACK immediately for each pack recieved (presumably within handle_read, but maybe with handle_write)
         if recPack[0] == (self.packSeq + 1):
             self.packSeq += 1
-            #send here or in handle_write?
+            self.send(struct.pack('LL', self.packSeq))#send here or in handle_write?
 
     def writable(self):
         print "Writable -> ", bool(self.outBuffer and self.isConnected)
         return bool(self.outBuffer and self.isConnected)
 
-    def handle_write(self): #sends ACKs(?)
+    def handle_write(self): #sends ACKs(or directly in handle_read?)
         print "handle_write sending..."
         sent = self.send(self.outBuffer)
         self.outBuffer = self.outBuffer[sent:]
