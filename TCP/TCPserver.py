@@ -47,6 +47,8 @@ class EchoServer(asyncore.dispatcher):
         else if recPack[0] == 0:
             self.packReq = recPack[1]
 
+        #need timeout somewhere for when to send/resend (send when all acks return, resend when timeout)
+
     def writable(self):
         print "Writable -> ", bool(self.packReq)
         return bool(self.packReq)
