@@ -3,10 +3,10 @@ import socket
 def Main():
     ipaddr = raw_input("Type the IP address below:\n")
     port = 8080
-    sock = socket.socket()
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((ipaddr, port))
 
-    sock.listen(1) # from docs the number means how many connections to listen for
+    # sock.listen(1) # from docs the number means how many connections to listen for
     cAddr, outAddr = sock.accept()
     print "Connection from: " and str(outAddr)
    # while True:
