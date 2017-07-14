@@ -81,12 +81,12 @@ class EchoServer(asyncore.dispatcher):
 
         #pause with while loop (conditionals: compare startTime to current, all acks received)
         while self.startTime - time.time() < self.timeoutTime:
-            if self.acksReceived: break
+            if self.acksReceived: break #TODO: Create self.acksReceived
             pass
 
         if self.acksReceived:
             #increase cwnd then send
-
+            self.cwnd += 1
         else
             #retransmit
         
