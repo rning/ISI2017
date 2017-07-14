@@ -58,6 +58,9 @@ class EchoServer(asyncore.dispatcher):
             #pack structure and send to client: [seq,ack,string]
             self.send(struct.pack('LL24s', self.seq + i, self.ack, 'data'))
 
+            #debug
+            print 'sent packet with seq#' , self.seq + i, 'ack#', self.ack 
+
         self.canWrite = False 
         self.packController()
         
@@ -72,7 +75,7 @@ class EchoServer(asyncore.dispatcher):
             #exit timeout loop if all packets acked
             if self.ack == self.seq + self.cwnd:
                 #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
-                if ssthresh = self.cwnd:
+                if ssthresh == self.cwnd:
                     self.canWrite = True
                     return
                 else:
