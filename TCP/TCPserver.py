@@ -31,7 +31,7 @@ class EchoServer(asyncore.dispatcher):
         self.ssthresh = 0 #what initial value to set?
         self.timeoutTime = 5 #time in seconds
         self.maxwnd = 8
-        
+        self.startTime = None
         self.canWrite = True
 
     def handle_read(self):
@@ -49,8 +49,26 @@ class EchoServer(asyncore.dispatcher):
             print 'acked', self.ack, 'sequence', self.seq, 'cwnd', self.cwnd
 
     def writable(self):
-        print "Writable -> ", bool(self.canWrite)
-        return bool(self.canWrite)
+        if self.startTime is None:
+            pass
+        else:
+            if time.time() - self.startTime < self.timeoutTime:
+                #exit timeout loop if all packets acked
+                if self.ack == self.seq + self.cwnd:
+                    #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
+                    if self.ssthresh == self.cwnd:
+                        self.canWrite = True
+                    else:
+                        self.ssthresh = self.cwnd
+                        self.cwnd = self.cwnd * 2
+                        self.canWrite = True
+            else:
+            #if function not exited by now (meaning all packets not acked), retransmit
+            #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
+                self.cwnd = self.cwnd / 2
+                self.canWrite = True
+
+        return bool(self.canWrite) 
 
     def handle_write(self):
         print "handle_write sending..."
@@ -65,36 +83,17 @@ class EchoServer(asyncore.dispatcher):
 
         self.canWrite = False 
         self.packetController()
-        
+        self.startTime = time.time()
     
     def packetController(self):
         print "packetController called"
 
-        startTime = time.time()
 
-        #pause with while loop (conditional: timeout)
-        while time.time() - startTime < self.timeoutTime:
-            #exit timeout loop if all packets acked
-            if self.ack == self.seq + self.cwnd:
-                #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
-                if self.ssthresh == self.cwnd:
-                    self.canWrite = True
-                    return
-                else:
-                    self.ssthresh = self.cwnd
-                    self.cwnd = self.cwnd * 2
-                    self.canWrite = True
-                    return
-
-        #if function not exited by now (meaning all packets not acked), retransmit
-        #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
-        self.cwnd = self.cwnd / 2
-        self.canWrite = True
-        
+       
 
 if __name__ == '__main__':
 
     add = input("Enter IP address of server in single quotes:\n")
     s = Server(add, 8080)
 
-    asyncore.loop() #(0)
+    asyncore.loop(0) #(0)
