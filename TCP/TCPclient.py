@@ -26,11 +26,14 @@ class Client(asyncore.dispatcher):
         print 'received packet with seq#' , packet[0], 'ack#', packet[1] 
         
         #increment ACK based on receieved pack seq
-        #send ACK immediately for each pack recieved (presumably within handle_read, but maybe with handle_write)
+        #send ACK immediately for each pack recieved
         if packet[0] == (self.ack + 1):
             self.ack += 1
             #pack structure and send to server: [seq,ack,string]
-            self.send(struct.pack('LL24s', self.seq, self.ack, 'data'))#send here or in handle_write?
+            self.send(struct.pack('LL24s', self.seq, self.ack, 'data'))
+
+            #debug
+            print 'sending ack'
 
 if __name__ == '__main__':
 
