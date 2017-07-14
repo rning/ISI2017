@@ -43,7 +43,7 @@ class EchoServer(asyncore.dispatcher):
         #if received ack is in right order increment ACK appropriately
         if packet[1] == self.ack + 1:
             self.ack += 1
-            self.seq += 1
+            self.seq += 1#
 
             #debug
             print 'acked', self.ack, 'sequence', self.seq, 'cwnd', self.cwnd
@@ -66,6 +66,7 @@ class EchoServer(asyncore.dispatcher):
             #if function not exited by now (meaning all packets not acked), retransmit
             #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
                 self.cwnd = self.cwnd / 2
+                #TODO make sure cwnd does not go below 1
                 self.canWrite = True
 
         return bool(self.canWrite) 
