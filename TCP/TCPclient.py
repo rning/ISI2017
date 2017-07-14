@@ -16,10 +16,6 @@ class Client(asyncore.dispatcher):
         print "Client: Connection Closed"
         self.close()
 
-    def readable(self):
-        print "Readable -> True"
-        return True
-
     def handle_read(self):
         print "handle_read reading..."
 

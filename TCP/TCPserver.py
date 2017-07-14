@@ -74,7 +74,7 @@ class EchoServer(asyncore.dispatcher):
             #exit timeout loop if all packets acked
             if self.ack == self.seq + self.cwnd:
                 #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
-                if ssthresh == self.cwnd:
+                if self.ssthresh == self.cwnd:
                     self.canWrite = True
                     return
                 else:
