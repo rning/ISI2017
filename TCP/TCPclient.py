@@ -24,7 +24,10 @@ class Client(asyncore.dispatcher):
         print "handle_read reading..."
 
         #unpack structure sent from server: [seq,ack,string]
-        recPack = struct.unpack('LL24s', self.recv(4096)) #size: 32 bytes
+        packet = struct.unpack('LL24s', self.recv(4096)) #size: 32 bytes
+
+        #debug
+        print 'received packet with seq#' , packet[0], 'ack#', packet[1] 
         
         #increment ACK based on receieved pack seq
         #send ACK immediately for each pack recieved (presumably within handle_read, but maybe with handle_write)
