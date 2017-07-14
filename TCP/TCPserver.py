@@ -45,6 +45,9 @@ class EchoServer(asyncore.dispatcher):
             self.ack += 1
             self.seq += 1
 
+            #debug
+            print 'acked', self.ack, 'sequence', self.seq, 'cwnd', self.cwnd
+
     def writable(self):
         print "Writable -> ", bool(self.canWrite)
         return bool(self.canWrite)
@@ -61,10 +64,10 @@ class EchoServer(asyncore.dispatcher):
             print 'sent packet with seq#' , self.seq + i, 'ack#', self.ack 
 
         self.canWrite = False 
-        self.packController()
+        self.packetController()
         
     
-    def packController(self):
+    def packetController(self):
         print "packetController called"
 
         startTime = time.time()
