@@ -18,11 +18,9 @@ class Client(asyncore.dispatcher):
 
     def handle_read(self):
         print "handle_read reading..."
-
-        receivedStruct = self.recv(4096)
         
         #unpack structure sent from server: [seq,ack,string]
-        packet = struct.unpack('LL24s', receivedStruct) #size: 32 bytes
+        packet = struct.unpack('LL24s', self.recv(4096)) #size: 32 bytes
 
         #debug
         print 'received packet with seq#' , packet[0], 'ack#', packet[1] 
