@@ -80,10 +80,11 @@ class EchoServer(asyncore.dispatcher):
         print "packetController called"
 
         #pause with while loop (conditionals: compare startTime to current, all acks received)
-        while self.startTime + self.timeoutTime > time.time() or self.acksReceived:
+        while self.startTime - time.time() < self.timeoutTime:
+            if self.acksReceived: break
             pass
 
-        if acksReceived:
+        if self.acksReceived:
             #increase cwnd then send
 
         else
