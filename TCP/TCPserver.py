@@ -18,7 +18,6 @@ class Server(asyncore.dispatcher):
         self.sock, self.address = self.accept()
         print "Server: Connection by ", self.address
         self.sock.setblocking(0)
-        self.sock.send(struct.pack('L60s', 0, '')) #sends empty packet to trigger Client handle_connect
         EchoServer(self.sock)
 
 class EchoServer(asyncore.dispatcher):
