@@ -5,3 +5,13 @@
 - [ ] Create trackable TCP simulation
   - [ ] Slow Start
 - [ ] Create Visualization
+
+### Current errors when running TCPclient.py
+```
+
+```
+
+### Current errors when running TCPserver.py
+```
+
+```
