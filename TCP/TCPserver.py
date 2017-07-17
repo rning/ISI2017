@@ -72,7 +72,6 @@ class EchoServer(asyncore.dispatcher):
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
                     self.cwnd = self.cwnd / 2
                     if self.cwnd < 1: cwnd = 1
-                    #TODO make sure cwnd does not go below 1
                     self.canWrite = True
             self.wcount += 1
             if self.wcount <= 50:
