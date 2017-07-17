@@ -4,6 +4,7 @@
 - [x] Scalable Send/Receive Between Client and Server nodes
 - [ ] Create trackable TCP simulation
   - [ ] Slow Start
+  - [ ] Packet Loss
 - [ ] Create Visualization
 
 ## Current Errors
