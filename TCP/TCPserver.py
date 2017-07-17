@@ -33,6 +33,9 @@ class EchoServer(asyncore.dispatcher):
         self.maxwnd = 8
         self.startTime = None
         self.canWrite = True
+        self.wcount = 0
+        self.canRead = False
+        self.rcount = 0
 
     def handle_read(self):
         print "handle_read reading..."
@@ -47,32 +50,43 @@ class EchoServer(asyncore.dispatcher):
 
             #debug
             print 'acked', self.ack, 'sequence', self.seq, 'cwnd', self.cwnd
-
+        self.canWrite = True
+        self.canRead = False
     def writable(self):
-        if self.startTime is None:
-            pass
-        else:
-            if time.time() - self.startTime < self.timeoutTime:
-                #exit timeout loop if all packets acked
-                if self.ack == self.seq + self.cwnd:
-                    #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
-                    if self.ssthresh == self.cwnd:
-                        self.canWrite = True
-                    else:
-                        self.ssthresh = self.cwnd
-                        self.cwnd = self.cwnd * 2
-                        self.canWrite = True
+        if not self.canRead:
+            if self.startTime is None:
+                pass
             else:
-            #if function not exited by now (meaning all packets not acked), retransmit
-            #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
-                self.cwnd = self.cwnd / 2
-                #TODO make sure cwnd does not go below 1
-                self.canWrite = True
+                if time.time() - self.startTime < self.timeoutTime:
+                    #exit timeout loop if all packets acked
+                    if self.ack == self.seq + self.cwnd:
+                        #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
+                        if self.ssthresh == self.cwnd:
+                            self.canWrite = True
+                        else:
+                            self.ssthresh = self.cwnd
+                            self.cwnd = self.cwnd * 2
+                            self.canWrite = True
+                else:
+                    #if function not exited by now (meaning all packets not acked), retransmit
+                    #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
+                    self.cwnd = self.cwnd / 2
+                    if self.cwnd < 1: cwnd = 1
+                    #TODO make sure cwnd does not go below 1
+                    self.canWrite = True
+            self.wcount += 1
+            if self.wcount <= 50:
+                print "writeable: ", self.canWrite
+            return bool(self.canWrite)
 
-        return bool(self.canWrite) 
+    def readable(self):
+        self.rcount += 1
+        if self.wcount <= 50:
+            print "readable: ", self.canRead
+        return bool(self.canRead)
 
     def handle_write(self):
-        print "handle_write sending..."
+        #print "handle_write sending..."
 
         #for loop to send cwnd# of packets
         for i in range(1, (self.cwnd + 1)):
@@ -82,8 +96,8 @@ class EchoServer(asyncore.dispatcher):
             #debug
             print 'sent packet with seq#' , self.seq + i, 'ack#', self.ack 
 
-        self.canWrite = False 
-        self.packetController()
+        self.canWrite = False
+        self.canRead = True
         self.startTime = time.time()
     
     def packetController(self):
@@ -94,7 +108,7 @@ class EchoServer(asyncore.dispatcher):
 
 if __name__ == '__main__':
 
-    add = input("Enter IP address of server in single quotes:\n")
+    add = str(input("Enter IP address of server in single quotes:\n"))
     s = Server(add, 8080)
 
-    asyncore.loop(0) #(0)
+    asyncore.loop(1) #(0)
