@@ -36,6 +36,7 @@ class EchoServer(asyncore.dispatcher):
         self.wcount = 0
         self.canRead = False
         self.rcount = 0
+        # TODO: ADD LIMIT TO WINDOW SIZE
 
     def handle_read(self):
         print "handle_read reading..."
@@ -60,13 +61,16 @@ class EchoServer(asyncore.dispatcher):
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout loop if all packets acked
                     if self.ack == self.seq + self.cwnd:
+                        print self.ack, "==", self.seq
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
                         if self.ssthresh == self.cwnd:
                             self.canWrite = True
+                            print self.ssthresh, "==", self.cwnd
                         else:
                             self.ssthresh = self.cwnd
                             self.cwnd = self.cwnd * 2
                             self.canWrite = True
+                            print "multiplied cwnd by 2"
                 else:
                     #if function not exited by now (meaning all packets not acked), retransmit
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
