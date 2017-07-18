@@ -115,8 +115,8 @@ class EchoServer(asyncore.dispatcher):
  
 
 if __name__ == '__main__':
-    add = str(input("Enter IP address of server in single quotes:\n"))
     try:
+        add = str(input("Enter IP address of server in single quotes:\n"))
         s = Server(add, 8080)
     except:
         print "Your address was typed incorrectly or the port is in timeout. Try again."
