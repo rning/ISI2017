@@ -40,6 +40,9 @@ class EchoServer(asyncore.dispatcher):
 
     def handle_read(self):
         print "handle_read reading..."
+        
+        # TODO: Rework logic for the entirety of handle_read. This by default won't really work.
+
 
         #unpack structure received from client: [seq,ack,string]
         packet = struct.unpack('LL24s', self.recv(4096)) #size: 32 bytes
