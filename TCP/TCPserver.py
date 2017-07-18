@@ -54,33 +54,32 @@ class EchoServer(asyncore.dispatcher):
         self.canWrite = True
         self.canRead = False
     def writable(self):
-        if not self.canRead:
-            if self.startTime is None:
-                pass
+        if self.startTime is None:
+            pass
+        else:
+            if time.time() - self.startTime < self.timeoutTime:
+                #exit timeout loop if all packets acked
+                if self.ack == self.seq + self.cwnd:
+                    print self.ack, "==", self.seq
+                    #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
+                    if self.ssthresh == self.cwnd:
+                        self.canWrite = True
+                        print self.ssthresh, "==", self.cwnd
+                    else:
+                        self.ssthresh = self.cwnd
+                        self.cwnd = self.cwnd * 2
+                        self.canWrite = True
+                        print "multiplied cwnd by 2"
             else:
-                if time.time() - self.startTime < self.timeoutTime:
-                    #exit timeout loop if all packets acked
-                    if self.ack == self.seq + self.cwnd:
-                        print self.ack, "==", self.seq
-                        #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
-                        if self.ssthresh == self.cwnd:
-                            self.canWrite = True
-                            print self.ssthresh, "==", self.cwnd
-                        else:
-                            self.ssthresh = self.cwnd
-                            self.cwnd = self.cwnd * 2
-                            self.canWrite = True
-                            print "multiplied cwnd by 2"
-                else:
-                    #if function not exited by now (meaning all packets not acked), retransmit
-                    #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
-                    self.cwnd = self.cwnd / 2
-                    if self.cwnd < 1: cwnd = 1
-                    self.canWrite = True
-            self.wcount += 1
-            if self.wcount <= 50:
-                print "writeable: ", self.canWrite
-            return bool(self.canWrite)
+                #if function not exited by now (meaning all packets not acked), retransmit
+                #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
+                self.cwnd = self.cwnd / 2
+                if self.cwnd < 1: cwnd = 1
+                self.canWrite = True
+        self.wcount += 1
+        if self.wcount <= 50:
+            print "writeable: ", self.canWrite
+        return bool(self.canWrite)
 
     def readable(self):
         self.rcount += 1
