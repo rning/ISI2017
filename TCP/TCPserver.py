@@ -51,13 +51,12 @@ class EchoServer(asyncore.dispatcher):
 
             #debug
             print 'acked', self.ack, 'sequence', self.seq, 'cwnd', self.cwnd
-        self.canWrite = True
-        self.canRead = False
-    def writable(self):
         if self.startTime is None:
             pass
         else:
+            print "startTime is NOT None"
             if time.time() - self.startTime < self.timeoutTime:
+                print "entered timeout check"
                 #exit timeout if all packets acked
                 if self.ack == self.seq + self.cwnd:
                     print self.ack, "==", self.seq
@@ -76,6 +75,10 @@ class EchoServer(asyncore.dispatcher):
                 self.cwnd = self.cwnd / 2
                 if self.cwnd < 1: cwnd = 1
                 self.canWrite = True
+        self.canWrite = True
+        self.canRead = False
+
+    def writable(self):
         self.wcount += 1
         if self.wcount <= 50:
             print "writeable: ", self.canWrite
@@ -109,8 +112,9 @@ class EchoServer(asyncore.dispatcher):
  
 
 if __name__ == '__main__':
-
     add = str(input("Enter IP address of server in single quotes:\n"))
-    s = Server(add, 8080)
-
+    try:
+        s = Server(add, 8080)
+    except:
+        print "Your address was typed incorrectly or the port is in timeout. Try again."
     asyncore.loop(1) #(0)
