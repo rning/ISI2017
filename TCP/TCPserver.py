@@ -1,4 +1,4 @@
-import asyncore, socket, struct, time
+import asyncore, socket, struct, time, threading
 #from ParameterParser import *
 
 class Server(asyncore.dispatcher):
@@ -36,12 +36,16 @@ class EchoServer(asyncore.dispatcher):
         self.wcount = 0
         self.canRead = False
         self.rcount = 0
+
+        packThread = threading.Thread(target=self.packetCheck, args = (self))
+        packThread.daemon = True
+        packThread.start()
         # TODO: ADD LIMIT TO WINDOW SIZE
 
     def handle_read(self):
         print "handle_read reading..."
         
-        # TODO: Rework logic for the entirety of handle_read. This by default won't really work.
+        # TODO: Use another thread to handle checking, and call "packetCheck()" in the thread  
 
 
         #unpack structure received from client: [seq,ack,string]
@@ -54,30 +58,6 @@ class EchoServer(asyncore.dispatcher):
 
             #debug
             print 'acked', self.ack, 'sequence', self.seq, 'cwnd', self.cwnd
-        if self.startTime is None:
-            pass
-        else:
-            print "startTime is NOT None"
-            if time.time() - self.startTime < self.timeoutTime:
-                print "entered timeout check"
-                #exit timeout if all packets acked
-                if self.ack == self.seq + self.cwnd:
-                    print self.ack, "==", self.seq
-                    #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
-                    if self.ssthresh == self.cwnd:
-                        self.canWrite = True
-                        print self.ssthresh, "==", self.cwnd
-                    else:
-                        self.ssthresh = self.cwnd
-                        self.cwnd = self.cwnd * 2
-                        self.canWrite = True
-                        print "multiplied cwnd by 2"
-            else:
-                #if function not exited by now (meaning all packets not acked), retransmit
-                #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
-                self.cwnd = self.cwnd / 2
-                if self.cwnd < 1: cwnd = 1
-                self.canWrite = True
         self.canWrite = True
         self.canRead = False
 
@@ -108,8 +88,31 @@ class EchoServer(asyncore.dispatcher):
         self.canRead = True
         self.startTime = time.time()
     
-    def packetController(self):
-        print "packetController called"
+    def packetCheck(self):
+        if self.startTime is None:
+            pass
+        else:
+            print "startTime is NOT None"
+            if time.time() - self.startTime < self.timeoutTime:
+                print "entered timeout check"
+                #exit timeout if all packets acked
+                if self.ack == self.seq + self.cwnd:
+                    print self.ack, "==", self.seq
+                    #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
+                    if self.ssthresh == self.cwnd:
+                        self.canWrite = True
+                        print self.ssthresh, "==", self.cwnd
+                    else:
+                        self.ssthresh = self.cwnd
+                        self.cwnd = self.cwnd * 2
+                        self.canWrite = True
+                        print "multiplied cwnd by 2"
+            else:
+                #if function not exited by now (meaning all packets not acked), retransmit
+                #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
+                self.cwnd = self.cwnd / 2
+                if self.cwnd < 1: cwnd = 1
+                self.canWrite = True
 
 
  
