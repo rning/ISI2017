@@ -36,25 +36,26 @@ class EchoServer(asyncore.dispatcher):
         self.wcount = 0
         self.canRead = False
         self.rcount = 0
+        self.canContinue = True
 
         packThread = threading.Thread(target=self.packetCheck, args = (self))
-        packThread.daemon = True
+        packThread.daemon = True # use another thread to check if packets were acked.
         packThread.start()
-        # TODO: ADD LIMIT TO WINDOW SIZE
+        # TODO: use LIMIT TO WINDOW SIZE
 
     def handle_read(self):
         print "handle_read reading..."
-        
-        # TODO: Use another thread to handle checking, and call "packetCheck()" in the thread  
+        self.canContinue = False
 
 
         #unpack structure received from client: [seq,ack,string]
         packet = struct.unpack('LL24s', self.recv(4096)) #size: 32 bytes
         
         #if received ack is in right order increment ACK appropriately
-        if packet[1] == self.ack + 1:
-            self.ack += 1
-            self.seq += 1#
+        while not self.canContinue: 
+            if packet[1] == self.ack + 1:
+                self.ack += 1
+                self.seq += 1#
 
             #debug
             print 'acked', self.ack, 'sequence', self.seq, 'cwnd', self.cwnd
@@ -89,30 +90,36 @@ class EchoServer(asyncore.dispatcher):
         self.startTime = time.time()
     
     def packetCheck(self):
-        if self.startTime is None:
-            pass
-        else:
-            print "startTime is NOT None"
-            if time.time() - self.startTime < self.timeoutTime:
-                print "entered timeout check"
-                #exit timeout if all packets acked
-                if self.ack == self.seq + self.cwnd:
-                    print self.ack, "==", self.seq
-                    #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
-                    if self.ssthresh == self.cwnd:
-                        self.canWrite = True
-                        print self.ssthresh, "==", self.cwnd
-                    else:
-                        self.ssthresh = self.cwnd
-                        self.cwnd = self.cwnd * 2
-                        self.canWrite = True
-                        print "multiplied cwnd by 2"
+        while True: # This function isn't running at the moment, although the thread should be running it.
+                    # Potential Reason 1: You can't use methods from a class inside a class in a thread
+                    # Potential Reason 2: The thread is called/used incorrectly
+            runCount = 0
+            if runCount < 1:
+                print "packetCheck has run" # print that packetCheck has run, but only once
+            runCount += 1
+            if self.startTime is None:
+                pass
             else:
-                #if function not exited by now (meaning all packets not acked), retransmit
-                #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
-                self.cwnd = self.cwnd / 2
-                if self.cwnd < 1: cwnd = 1
-                self.canWrite = True
+                print "startTime is NOT None"
+                if time.time() - self.startTime < self.timeoutTime:
+                    print "entered timeout check"
+                    #exit timeout if all packets acked
+                    if self.ack == self.seq + self.cwnd:
+                        print self.ack, "==", self.seq
+                        #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
+                        if self.ssthresh == self.cwnd:
+                            print self.ssthresh, "==", self.cwnd
+                            self.canContinue = True
+                        else:
+                            self.ssthresh = self.cwnd
+                            self.cwnd = self.cwnd * 2
+                            self.canContinue = True
+                            print "multiplied cwnd by 2"
+                else:
+                    #if function not exited by now (meaning all packets not acked), retransmit
+                    #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
+                    self.cwnd = self.cwnd / 2
+                    if self.cwnd < 1: cwnd = 1
 
 
  
