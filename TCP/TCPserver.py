@@ -18,7 +18,16 @@ class Server(asyncore.dispatcher):
         self.sock, self.address = self.accept()
         print "Server: Connection by ", self.address
         self.sock.setblocking(0)
-        EchoServer(self.sock)
+        eServ1 = EchoServer(self.sock)
+        eServ1PH = eServ1.packetCheck() # call packetcheck to start the thread
+
+def outerThread(function):
+    def checkWrap(*args):
+        packThread = threading.Thread(target=function, args=args)
+        packThread.daemon = True
+        packThread.start()
+        return packThread
+    return checkWrap
 
 class EchoServer(asyncore.dispatcher):
 
@@ -38,9 +47,7 @@ class EchoServer(asyncore.dispatcher):
         self.rcount = 0
         self.canContinue = True
 
-        packThread = threading.Thread(target=self.packetCheck, args = (self))
-        packThread.daemon = True # use another thread to check if packets were acked.
-        packThread.start()
+        
         # TODO: use LIMIT TO WINDOW SIZE
 
     def handle_read(self):
@@ -88,15 +95,10 @@ class EchoServer(asyncore.dispatcher):
         self.canWrite = False
         self.canRead = True
         self.startTime = time.time()
-    
+
+    @outerThread
     def packetCheck(self):
-        while True: # This function isn't running at the moment, although the thread should be running it.
-                    # Potential Reason 1: You can't use methods from a class inside a class in a thread
-                    # Potential Reason 2: The thread is called/used incorrectly
-            runCount = 0
-            if runCount < 1:
-                print "packetCheck has run" # print that packetCheck has run, but only once
-            runCount += 1
+        while True: 
             if self.startTime is None:
                 pass
             else:
