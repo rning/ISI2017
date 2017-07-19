@@ -75,6 +75,7 @@ class EchoServer(asyncore.dispatcher):
 
                 #debug
                 logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
+                time.sleep(.002)
             time.sleep(.002)
             # self.canWrite = True
             # self.canRead = False
