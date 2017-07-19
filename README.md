@@ -14,8 +14,7 @@
 ##### Possible Solutions
 *Figure out a way to check if all packets were sent from the server, perhaps send the current window alongside the acks and check if the number of packets sent meets the current window criteria. The problem with the idea is that it kind of defeats the purpose of TCP.*
 
-*Or, we can make a third thread and have the server constantly also be reading acks*
-^ I like this idea
+*Or, we can make a third thread and have the server constantly also be reading acks* (I like this idea)
 
 #### TCPclient.py:
 ```
