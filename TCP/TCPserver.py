@@ -1,4 +1,4 @@
-import asyncore, socket, struct, time, threading
+import asyncore, socket, struct, time, threading, logging
 #from ParameterParser import *
 
 class Server(asyncore.dispatcher):
@@ -20,6 +20,7 @@ class Server(asyncore.dispatcher):
         self.sock.setblocking(0)
         eServ1 = EchoServer(self.sock)
         eServ1PH = eServ1.packetCheck() # call packetcheck to start the thread
+        eServ1R = eServ1.handle_read()
 
 def outerThread(function):
     def checkWrap(*args):
@@ -28,6 +29,14 @@ def outerThread(function):
         packThread.start()
         return packThread
     return checkWrap
+
+def innerReadThreadHandler(function):
+    def iRTHWrapper(*args):
+        rThread = threading.Thread(target=function, args=args)
+        rThread.setDaemon(True)
+        rThread.start()
+        return rThread
+    return iRTHWrapper # these returns aren't really needed, but just incase we need to reference the thread
 
 class EchoServer(asyncore.dispatcher):
 
@@ -46,13 +55,12 @@ class EchoServer(asyncore.dispatcher):
         self.canRead = False
         self.rcount = 0
         self.canContinue = True
-
+        logging.basicConfig(format='%(message)s', level=logging.DEBUG)
         
-        # TODO: use LIMIT TO WINDOW SIZE
-    @outerThread
+    @innerReadThreadHandler
     def handle_read(self):
         while True:
-            print "handle_read reading..."
+            logging.debug("handle_read reading...")
             self.canContinue = False
 
 
@@ -66,7 +74,7 @@ class EchoServer(asyncore.dispatcher):
                     self.seq += 1#
 
                 #debug
-                print 'acked', self.ack, 'sequence', self.seq, 'cwnd', self.cwnd
+                logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
             time.sleep(.002)
             # self.canWrite = True
             # self.canRead = False
@@ -74,7 +82,7 @@ class EchoServer(asyncore.dispatcher):
     def writable(self):
         self.wcount += 1
         if self.wcount <= 50:
-            print "writeable: ", self.canWrite
+            logging.debug("writeable: " + str(self.canWrite))
         return bool(self.canWrite)
 
 #    def readable(self):
@@ -92,7 +100,7 @@ class EchoServer(asyncore.dispatcher):
             self.send(struct.pack('LL24s', self.seq + i, self.ack, 'data'))
 
             #debug
-            print 'sent packet with seq#' , self.seq + i, 'ack#', self.ack 
+            logging.debug('sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack)) 
 
         # self.canWrite = False
         # self.canRead = True
@@ -104,21 +112,17 @@ class EchoServer(asyncore.dispatcher):
             if self.startTime is None:
                 pass
             else:
-                print "startTime is NOT None"
                 if time.time() - self.startTime < self.timeoutTime:
-                    print "entered timeout check"
                     #exit timeout if all packets acked
                     if self.ack == self.seq: # + self.cwnd # These ifs don't run if you use + self.cwnd. Perhaps these can never be fulfilled?
-                        print self.ack, "==", self.seq
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
                         if self.ssthresh == self.cwnd:
-                            print self.ssthresh, "==", self.cwnd
                             self.canContinue = True
                         else:
                             self.ssthresh = self.cwnd
                             self.cwnd = self.cwnd * 2
                             self.canContinue = True
-                            print "multiplied cwnd by 2"
+                            logging.log("cwnd multiplied by 2")
                 else:
                     #if function not exited by now (meaning all packets not acked), retransmit
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
