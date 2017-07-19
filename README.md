@@ -10,10 +10,9 @@
 ## Current Outputs
 
 ##### Current Thoughts on Errors
-These errors might be due to the client sending acks in between each packet, but the server is not checking for them (since it is busy sending).
-
+*These errors might be due to the client sending acks in between each packet, but the server is not checking for them (since it is busy sending).*
 ##### Possible Solutions
-Figure out a way to check if all packets were sent from the server, perhaps send the current window alongside the acks and check if the number of packets sent meets the current window criteria. The problem with the idea is that it kind of defeats the purpose of TCP.
+*Figure out a way to check if all packets were sent from the server, perhaps send the current window alongside the acks and check if the number of packets sent meets the current window criteria. The problem with the idea is that it kind of defeats the purpose of TCP.*
 
 #### TCPclient.py:
 ```
