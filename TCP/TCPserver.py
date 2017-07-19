@@ -24,7 +24,7 @@ class Server(asyncore.dispatcher):
 def outerThread(function):
     def checkWrap(*args):
         packThread = threading.Thread(target=function, args=args)
-        packThread.daemon = True
+        packThread.setDaemon(True)
         packThread.start()
         return packThread
     return checkWrap
@@ -106,7 +106,7 @@ class EchoServer(asyncore.dispatcher):
                 if time.time() - self.startTime < self.timeoutTime:
                     print "entered timeout check"
                     #exit timeout if all packets acked
-                    if self.ack == self.seq + self.cwnd:
+                    if self.ack == self.seq: # + self.cwnd # These ifs don't run. Perhaps these can never be fulfilled?
                         print self.ack, "==", self.seq
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
                         if self.ssthresh == self.cwnd:
@@ -122,6 +122,7 @@ class EchoServer(asyncore.dispatcher):
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
                     self.cwnd = self.cwnd / 2
                     if self.cwnd < 1: cwnd = 1
+            time.sleep(.002)
 
 
  
@@ -132,4 +133,4 @@ if __name__ == '__main__':
         s = Server(add, 8080)
     except:
         print "Your address was typed incorrectly or the port is in timeout. Try again."
-    asyncore.loop(1) #(0)
+    asyncore.loop(20) #(0)
