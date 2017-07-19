@@ -49,25 +49,27 @@ class EchoServer(asyncore.dispatcher):
 
         
         # TODO: use LIMIT TO WINDOW SIZE
-
+    @outerThread
     def handle_read(self):
-        print "handle_read reading..."
-        self.canContinue = False
+        while True:
+            print "handle_read reading..."
+            self.canContinue = False
 
 
-        #unpack structure received from client: [seq,ack,string]
-        packet = struct.unpack('LL24s', self.recv(4096)) #size: 32 bytes
-        
-        #if received ack is in right order increment ACK appropriately
-        while not self.canContinue: 
-            if packet[1] == self.ack + 1:
-                self.ack += 1
-                self.seq += 1#
+            #unpack structure received from client: [seq,ack,string]
+            packet = struct.unpack('LL24s', self.recv(4096)) #size: 32 bytes
+            
+            #if received ack is in right order increment ACK appropriately
+            while not self.canContinue: 
+                if packet[1] == self.ack + 1:
+                    self.ack += 1
+                    self.seq += 1#
 
-            #debug
-            print 'acked', self.ack, 'sequence', self.seq, 'cwnd', self.cwnd
-        self.canWrite = True
-        self.canRead = False
+                #debug
+                print 'acked', self.ack, 'sequence', self.seq, 'cwnd', self.cwnd
+            time.sleep(.002)
+            # self.canWrite = True
+            # self.canRead = False
 
     def writable(self):
         self.wcount += 1
@@ -75,11 +77,11 @@ class EchoServer(asyncore.dispatcher):
             print "writeable: ", self.canWrite
         return bool(self.canWrite)
 
-    def readable(self):
-        self.rcount += 1
-        if self.wcount <= 50:
-            print "readable: ", self.canRead
-        return bool(self.canRead)
+#    def readable(self):
+#        self.rcount += 1
+#        if self.wcount <= 50:
+#            print "readable: ", self.canRead
+#        return bool(self.canRead)
 
     def handle_write(self):
         #print "handle_write sending..."
@@ -92,8 +94,8 @@ class EchoServer(asyncore.dispatcher):
             #debug
             print 'sent packet with seq#' , self.seq + i, 'ack#', self.ack 
 
-        self.canWrite = False
-        self.canRead = True
+        # self.canWrite = False
+        # self.canRead = True
         self.startTime = time.time()
 
     @outerThread
@@ -106,7 +108,7 @@ class EchoServer(asyncore.dispatcher):
                 if time.time() - self.startTime < self.timeoutTime:
                     print "entered timeout check"
                     #exit timeout if all packets acked
-                    if self.ack == self.seq: # + self.cwnd # These ifs don't run. Perhaps these can never be fulfilled?
+                    if self.ack == self.seq: # + self.cwnd # These ifs don't run if you use + self.cwnd. Perhaps these can never be fulfilled?
                         print self.ack, "==", self.seq
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
                         if self.ssthresh == self.cwnd:
