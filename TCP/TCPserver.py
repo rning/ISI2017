@@ -77,8 +77,8 @@ class EchoServer(asyncore.dispatcher):
                 logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
                 time.sleep(.002)
             time.sleep(.002)
-            # self.canWrite = True
-            # self.canRead = False
+          #  self.canWrite = True
+          #  self.canRead = False
 
     def writable(self):
         self.wcount += 1
@@ -123,7 +123,7 @@ class EchoServer(asyncore.dispatcher):
                             self.ssthresh = self.cwnd
                             self.cwnd = self.cwnd * 2
                             self.canContinue = True
-                            logging.log("cwnd multiplied by 2")
+                            logging.debug("cwnd multiplied by 2")
                 else:
                     #if function not exited by now (meaning all packets not acked), retransmit
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
