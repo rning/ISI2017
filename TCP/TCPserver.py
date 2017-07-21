@@ -19,8 +19,6 @@ class Server(asyncore.dispatcher):
         print "Server: Connection by ", self.address
         self.sock.setblocking(0)
         EchoServer(self.sock)
-        #eServ1PH = eServ1.packetCheck() # call packetcheck to start the thread
-        # eServ1R = eServ1.handle_read()
 
 def outerThread(function):
     def checkWrap(*args):
@@ -57,6 +55,7 @@ class EchoServer(asyncore.dispatcher):
         logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 
         self.packetCheck()
+        #self.handle_read()
         
     # @innerReadThreadHandler
     def handle_read(self):
@@ -78,7 +77,7 @@ class EchoServer(asyncore.dispatcher):
         #debug
         logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
         #time.sleep(.002)
-        self.canWrite = True
+        #self.canWrite = True
         #self.canRead = False
 
     def writable(self):
