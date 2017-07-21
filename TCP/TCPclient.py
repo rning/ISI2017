@@ -7,7 +7,6 @@ class Client(asyncore.dispatcher):
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connect((host, port))
-        self.outBuffer = "" #
 
         self.seq = 0
         self.ack = 0
@@ -16,11 +15,11 @@ class Client(asyncore.dispatcher):
         print "Client: Connection Closed"
         self.close()
 
-    def handle_read(self): #split up buffer
+    def handle_read(self):
         print "handle_read reading..."
 
         readBuffer = self.recv(4096)
-        for i in rance(0, len(readBuffer) / 40):
+        for i in range(0, len(readBuffer) / 40):
             #unpack structure sent from server: [seq,ack,string]
             packet = struct.unpack('LL24s', readBuffer[:41]) #size: 32 bytes
 
