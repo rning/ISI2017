@@ -72,9 +72,10 @@ class EchoServer(asyncore.dispatcher):
                 self.seq += 1
                 self.ackCounter += 1
 
+                logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
+
             readBuffer = readBuffer[41:]
 
-        logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
         #time.sleep(.002)
 
     def writable(self):
