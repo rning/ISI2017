@@ -23,12 +23,7 @@ class Client(asyncore.dispatcher):
         
         for i in range(0, len(readBuffer) / 40):
             #unpack structure sent from server: [seq,ack,string]
-            try:
-                packet = struct.unpack('LL24s', readBuffer[:41]) #size: 32 bytes
-            except:
-                print "unpack failed"
-                time.sleep(1)
-                packet = struct.unpack('LL24s', readBuffer[:41])
+            packet = struct.unpack('LL24s', readBuffer[:41]) #size: 32 bytes
                 
             print 'received packet with seq#' , packet[0], 'ack#', packet[1] 
 
