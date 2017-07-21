@@ -23,7 +23,7 @@ class Client(asyncore.dispatcher):
         
         for i in range(0, len(readBuffer) / 40):
             #unpack structure sent from server: [seq,ack,string]
-            packet = struct.unpack('LL24s', readBuffer[:41]) #size: 32 bytes
+            packet = struct.unpack('LL24s', readBuffer[:40]) #size: 32 bytes
                 
             print 'received packet with seq#' , packet[0], 'ack#', packet[1] 
 
@@ -36,7 +36,7 @@ class Client(asyncore.dispatcher):
 
                 print 'sending ack'
 
-            readBuffer = readBuffer[41:]
+            readBuffer = readBuffer[40:]
 
 if __name__ == '__main__':
 

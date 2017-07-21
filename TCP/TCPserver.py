@@ -66,7 +66,7 @@ class EchoServer(asyncore.dispatcher):
         for i in range(0, len(readBuffer) / 40):
 
             #unpack structure received from client: [seq,ack,string]
-            packet = struct.unpack('LL24s', readBuffer[:41]) #size: 32 bytes
+            packet = struct.unpack('LL24s', readBuffer[:40]) #size: 32 bytes
 
             #if received ack is in right order increment ACK appropriately
             if packet[1] == self.ack + 1:
