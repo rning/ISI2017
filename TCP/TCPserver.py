@@ -112,10 +112,12 @@ class EchoServer(asyncore.dispatcher):
                         self.ackCounter = 0
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
                         if self.ssthresh == self.cwnd:
+                            self.canWrite = True
                             self.canContinue = True
                         else:
                             self.ssthresh = self.cwnd
                             self.cwnd = self.cwnd * 2
+                            self.canWrite = True
                             self.canContinue = True
                             logging.debug("cwnd multiplied by 2")
                 else:
@@ -123,6 +125,7 @@ class EchoServer(asyncore.dispatcher):
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
                     self.cwnd = self.cwnd / 2
                     if self.cwnd < 1: cwnd = 1
+                    self.canWrite =True
 
                     self.ackCounter = 0
 
