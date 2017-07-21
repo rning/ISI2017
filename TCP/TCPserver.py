@@ -124,6 +124,9 @@ class EchoServer(asyncore.dispatcher):
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
                     self.cwnd = self.cwnd / 2
                     if self.cwnd < 1: cwnd = 1
+
+                    self.ackCounter = 0
+
             time.sleep(.002)
 
 
