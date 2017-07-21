@@ -64,7 +64,7 @@ class EchoServer(asyncore.dispatcher):
         for i in range(0, len(readBuffer) / 40):
 
             #unpack structure received from client: [seq,ack,string]
-            packet = struct.unpack('LL24s', readBuffer[:41])) #size: 32 bytes
+            packet = struct.unpack('LL24s', readBuffer[:41]) #size: 32 bytes
 
             #if received ack is in right order increment ACK appropriately
             if packet[1] == self.ack + 1:
@@ -129,4 +129,4 @@ if __name__ == '__main__':
         s = Server(add, 8080)
     except:
         print "Your address was typed incorrectly or the port is in timeout. Try again."
-    asyncore.loop(1) #(0)
+    asyncore.loop(5) #(0)
