@@ -18,8 +18,8 @@ class Server(asyncore.dispatcher):
         self.sock, self.address = self.accept()
         print "Server: Connection by ", self.address
         self.sock.setblocking(0)
-        eServ1 = EchoServer(self.sock)
-        eServ1PH = eServ1.packetCheck() # call packetcheck to start the thread
+        EchoServer(self.sock)
+        #eServ1PH = eServ1.packetCheck() # call packetcheck to start the thread
         # eServ1R = eServ1.handle_read()
 
 def outerThread(function):
@@ -55,6 +55,8 @@ class EchoServer(asyncore.dispatcher):
         #self.canRead = False
         self.canContinue = True
         logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+
+        self.packetCheck()
         
     # @innerReadThreadHandler
     def handle_read(self):
@@ -125,7 +127,7 @@ class EchoServer(asyncore.dispatcher):
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
                     self.cwnd = self.cwnd / 2
                     if self.cwnd < 1: cwnd = 1
-                    self.canWrite =True
+                    self.canWrite = True
 
                     self.ackCounter = 0
 
