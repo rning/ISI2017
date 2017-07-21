@@ -60,17 +60,20 @@ class EchoServer(asyncore.dispatcher):
     def handle_read(self):
         logging.debug("handle_read reading...")
 
-        #unpack structure received from client: [seq,ack,string]
-        packet = struct.unpack('LL24s', self.recv(4096)) #size: 32 bytes
-        
-        #if received ack is in right order increment ACK appropriately
-        # while not self.canContinue: 
-        if packet[1] == self.ack + 1:
-            self.ack += 1
-            self.seq += 1#
-            self.ackCounter += 1
+        readBuffer = self.recv(4096)
+        for i in range(0, len(readBuffer) / 40):
 
-        #debug
+            #unpack structure received from client: [seq,ack,string]
+            packet = struct.unpack('LL24s', readBuffer[:41])) #size: 32 bytes
+
+            #if received ack is in right order increment ACK appropriately
+            if packet[1] == self.ack + 1:
+                self.ack += 1
+                self.seq += 1
+                self.ackCounter += 1
+
+            readBuffer = readBuffer[41:]
+
         logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
         #time.sleep(.002)
 
