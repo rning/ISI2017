@@ -20,7 +20,7 @@ class Server(asyncore.dispatcher):
         self.sock.setblocking(0)
         eServ1 = EchoServer(self.sock)
         eServ1PH = eServ1.packetCheck() # call packetcheck to start the thread
-        eServ1R = eServ1.handle_read()
+        # eServ1R = eServ1.handle_read()
 
 def outerThread(function):
     def checkWrap(*args):
@@ -45,6 +45,7 @@ class EchoServer(asyncore.dispatcher):
 
         self.seq = 0
         self.ack = 0
+        self.iSeq = 0
         self.cwnd = 1
         self.ssthresh = 0 #what initial value to set?
         self.timeoutTime = 5 #time in seconds
@@ -57,28 +58,28 @@ class EchoServer(asyncore.dispatcher):
         self.canContinue = True
         logging.basicConfig(format='%(message)s', level=logging.DEBUG)
         
-    @innerReadThreadHandler
+    # @innerReadThreadHandler
     def handle_read(self):
-        while True:
-            logging.debug("handle_read reading...")
-            self.canContinue = False
+        # while True:
+        logging.debug("handle_read reading...")
+        self.canContinue = False
 
 
-            #unpack structure received from client: [seq,ack,string]
-            packet = struct.unpack('LL24s', self.recv(4096)) #size: 32 bytes
-            
-            #if received ack is in right order increment ACK appropriately
-            while not self.canContinue: 
-                if packet[1] == self.ack + 1:
-                    self.ack += 1
-                    self.seq += 1#
+        #unpack structure received from client: [seq,ack,string]
+        packet = struct.unpack('LL24s', self.recv(4096)) #size: 32 bytes
+        
+        #if received ack is in right order increment ACK appropriately
+        # while not self.canContinue: 
+        if packet[1] == self.ack + 1:
+            self.ack += 1
+            self.seq += 1#
 
-                #debug
-                logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
-                time.sleep(.002)
-            time.sleep(.002)
-          #  self.canWrite = True
-          #  self.canRead = False
+        #debug
+        logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
+        time.sleep(.002)
+    # time.sleep(.002)
+        self.canWrite = True
+        self.canRead = False
 
     def writable(self):
         self.wcount += 1
@@ -86,11 +87,11 @@ class EchoServer(asyncore.dispatcher):
             logging.debug("writeable: " + str(self.canWrite))
         return bool(self.canWrite)
 
-#    def readable(self):
-#        self.rcount += 1
-#        if self.wcount <= 50:
-#            print "readable: ", self.canRead
-#        return bool(self.canRead)
+    def readable(self):
+        self.rcount += 1
+        if self.wcount <= 50:
+            print "readable: ", self.canRead
+        return bool(self.canRead)
 
     def handle_write(self):
         #print "handle_write sending..."
@@ -103,8 +104,8 @@ class EchoServer(asyncore.dispatcher):
             #debug
             logging.debug('sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack)) 
 
-        # self.canWrite = False
-        # self.canRead = True
+        self.canWrite = False
+        self.canRead = True
         self.startTime = time.time()
 
     @outerThread
@@ -115,7 +116,7 @@ class EchoServer(asyncore.dispatcher):
             else:
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout if all packets acked
-                    if self.ack == self.seq: # + self.cwnd # These ifs don't run if you use + self.cwnd. Perhaps these can never be fulfilled?
+                    if self.ack == self.seq + self.cwnd: # These ifs don't run if you use + self.cwnd. Perhaps these can never be fulfilled?
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
                         if self.ssthresh == self.cwnd:
                             self.canContinue = True

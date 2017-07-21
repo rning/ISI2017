@@ -21,7 +21,6 @@ class Client(asyncore.dispatcher):
         
         #unpack structure sent from server: [seq,ack,string]
         packet = struct.unpack('LL24s', self.recv(4096)) #size: 32 bytes
-
         #debug
         print 'received packet with seq#' , packet[0], 'ack#', packet[1] 
         
