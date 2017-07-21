@@ -45,16 +45,14 @@ class EchoServer(asyncore.dispatcher):
 
         self.seq = 0
         self.ack = 0
-        self.iSeq = 0
+        self.ackCounter = 0
         self.cwnd = 1
         self.ssthresh = 0 #what initial value to set?
         self.timeoutTime = 5 #time in seconds
         self.maxwnd = 8
         self.startTime = None
         self.canWrite = True
-        self.wcount = 0
         self.canRead = False
-        self.rcount = 0
         self.canContinue = True
         logging.basicConfig(format='%(message)s', level=logging.DEBUG)
         
@@ -73,6 +71,7 @@ class EchoServer(asyncore.dispatcher):
         if packet[1] == self.ack + 1:
             self.ack += 1
             self.seq += 1#
+            self.ackCounter += 1
 
         #debug
         logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
@@ -110,7 +109,8 @@ class EchoServer(asyncore.dispatcher):
             else:
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout if all packets acked
-                    if self.ack == self.seq + self.cwnd: # These ifs don't run if you use + self.cwnd. Perhaps these can never be fulfilled?
+                    if self.ackCounter == self.cwnd: # These ifs don't run if you use + self.cwnd. Perhaps these can never be fulfilled?
+                        self.ackCounter = 0
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
                         if self.ssthresh == self.cwnd:
                             self.canContinue = True
