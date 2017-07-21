@@ -46,7 +46,7 @@ class EchoServer(asyncore.dispatcher):
         self.ackCounter = 0
         self.cwnd = 1
         self.ssthresh = 0 #what initial value to set?
-        self.timeoutTime = 5 #time in seconds
+        self.timeoutTime = 30 #time in seconds
         self.maxwnd = 8
         self.startTime = None
         self.canWrite = True
@@ -61,6 +61,9 @@ class EchoServer(asyncore.dispatcher):
         logging.debug("handle_read reading...")
 
         readBuffer = self.recv(4096)
+        logging.debug(str(readBuffer))
+        logging.debug(str(len(readBuffer)))
+        
         for i in range(0, len(readBuffer) / 40):
 
             #unpack structure received from client: [seq,ack,string]
@@ -75,8 +78,6 @@ class EchoServer(asyncore.dispatcher):
                 logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
 
             readBuffer = readBuffer[41:]
-
-        #time.sleep(.002)
 
     def writable(self):
         return bool(self.canWrite)

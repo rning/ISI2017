@@ -41,4 +41,4 @@ if __name__ == '__main__':
     address = str(input("Enter IP address of server in single quotes:\n"))
     c = Client(address, 8080)
 
-    asyncore.loop(1) #(0)
+    asyncore.loop(0) #(0)
