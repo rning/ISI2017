@@ -50,8 +50,7 @@ class EchoServer(asyncore.dispatcher):
         self.maxwnd = 8
         self.startTime = None
         self.canWrite = True
-        #self.canRead = False
-        self.canContinue = True
+
         logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 
         self.packetCheck()
@@ -59,10 +58,7 @@ class EchoServer(asyncore.dispatcher):
         
     # @innerReadThreadHandler
     def handle_read(self):
-        # while True:
         logging.debug("handle_read reading...")
-        self.canContinue = False
-
 
         #unpack structure received from client: [seq,ack,string]
         packet = struct.unpack('LL24s', self.recv(4096)) #size: 32 bytes
@@ -77,18 +73,11 @@ class EchoServer(asyncore.dispatcher):
         #debug
         logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
         #time.sleep(.002)
-        #self.canWrite = True
-        #self.canRead = False
 
     def writable(self):
         return bool(self.canWrite)
 
-    #def readable(self):
-        #return bool(self.canRead)
-
     def handle_write(self):
-        #print "handle_write sending..."
-
         #for loop to send cwnd# of packets
         for i in range(1, (self.cwnd + 1)):
             #pack structure and send to client: [seq,ack,string]
@@ -98,7 +87,6 @@ class EchoServer(asyncore.dispatcher):
             logging.debug('sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack)) 
 
         self.canWrite = False
-        #self.canRead = True
         self.startTime = time.time()
 
     @outerThread
@@ -109,17 +97,16 @@ class EchoServer(asyncore.dispatcher):
             else:
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout if all packets acked
-                    if self.ackCounter == self.cwnd: # These ifs don't run if you use + self.cwnd. Perhaps these can never be fulfilled?
+                    if self.ackCounter == self.cwnd:
                         self.ackCounter = 0
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
                         if self.ssthresh == self.cwnd:
                             self.canWrite = True
-                            self.canContinue = True
+                            logging.debug("cwnd reached threshhold")
                         else:
                             self.ssthresh = self.cwnd
                             self.cwnd = self.cwnd * 2
                             self.canWrite = True
-                            self.canContinue = True
                             logging.debug("cwnd multiplied by 2")
                 else:
                     #if function not exited by now (meaning all packets not acked), retransmit
@@ -127,13 +114,11 @@ class EchoServer(asyncore.dispatcher):
                     self.cwnd = self.cwnd / 2
                     if self.cwnd < 1: cwnd = 1
                     self.canWrite = True
+                    logging.debug("timeout -> retransmit")
 
                     self.ackCounter = 0
 
             time.sleep(.002)
-
-
- 
 
 if __name__ == '__main__':
     try:
@@ -141,4 +126,4 @@ if __name__ == '__main__':
         s = Server(add, 8080)
     except:
         print "Your address was typed incorrectly or the port is in timeout. Try again."
-    asyncore.loop(20) #(0)
+    asyncore.loop(1) #(0)

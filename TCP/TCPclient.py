@@ -16,7 +16,7 @@ class Client(asyncore.dispatcher):
         print "Client: Connection Closed"
         self.close()
 
-    def handle_read(self):
+    def handle_read(self): #split up buffer
         print "handle_read reading..."
         
         #unpack structure sent from server: [seq,ack,string]
