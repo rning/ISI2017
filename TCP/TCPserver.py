@@ -28,14 +28,6 @@ def outerThread(function):
         return packThread
     return checkWrap
 
-def innerReadThreadHandler(function):
-    def iRTHWrapper(*args):
-        rThread = threading.Thread(target=function, args=args)
-        rThread.setDaemon(True)
-        rThread.start()
-        return rThread
-    return iRTHWrapper # these returns aren't really needed, but just incase we need to reference the thread
-
 class EchoServer(asyncore.dispatcher):
 
     def __init__(self, sock):
@@ -54,9 +46,7 @@ class EchoServer(asyncore.dispatcher):
         logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 
         self.packetCheck()
-        #self.handle_read()
         
-    # @innerReadThreadHandler
     def handle_read(self):
         logging.debug("handle_read reading...")
 
@@ -64,7 +54,6 @@ class EchoServer(asyncore.dispatcher):
         logging.debug(str(len(readBuffer)))
         
         for i in range(0, len(readBuffer) / 40):
-
             #unpack structure received from client: [seq,ack,string]
             packet = struct.unpack('LL24s', readBuffer[:40]) #size: 32 bytes
 
@@ -75,7 +64,6 @@ class EchoServer(asyncore.dispatcher):
                 self.ackCounter += 1
 
                 logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
-
             readBuffer = readBuffer[40:]
 
     def writable(self):
@@ -130,4 +118,4 @@ if __name__ == '__main__':
         s = Server(add, 8080)
     except:
         print "Your address was typed incorrectly or the port is in timeout. Try again."
-    asyncore.loop(0) #(0)
+    asyncore.loop(0)

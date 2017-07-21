@@ -24,7 +24,6 @@ class Client(asyncore.dispatcher):
         for i in range(0, len(readBuffer) / 40):
             #unpack structure sent from server: [seq,ack,string]
             packet = struct.unpack('LL24s', readBuffer[:40]) #size: 32 bytes
-                
             print 'received packet with seq#' , packet[0], 'ack#', packet[1] 
 
             #increment ACK based on receieved pack seq
@@ -33,7 +32,6 @@ class Client(asyncore.dispatcher):
                 self.ack += 1
                 #pack structure and send to server: [seq,ack,string]
                 self.send(struct.pack('LL24s', self.seq, self.ack, 'data'))
-
                 print 'sending ack'
 
             readBuffer = readBuffer[40:]
@@ -43,4 +41,4 @@ if __name__ == '__main__':
     address = str(input("Enter IP address of server in single quotes:\n"))
     c = Client(address, 8080)
 
-    asyncore.loop(0) #(0)
+    asyncore.loop(0)
