@@ -76,7 +76,7 @@ class EchoServer(asyncore.dispatcher):
 
                 logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
 
-            readBuffer = readBuffer[41:]
+            readBuffer = readBuffer[40:]
 
     def writable(self):
         return bool(self.canWrite)
