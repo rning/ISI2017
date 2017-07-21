@@ -129,4 +129,4 @@ if __name__ == '__main__':
         s = Server(add, 8080)
     except:
         print "Your address was typed incorrectly or the port is in timeout. Try again."
-    asyncore.loop(5) #(0)
+    asyncore.loop(1) #(0)
