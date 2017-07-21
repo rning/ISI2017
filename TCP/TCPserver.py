@@ -52,7 +52,7 @@ class EchoServer(asyncore.dispatcher):
         self.maxwnd = 8
         self.startTime = None
         self.canWrite = True
-        self.canRead = False
+        #self.canRead = False
         self.canContinue = True
         logging.basicConfig(format='%(message)s', level=logging.DEBUG)
         
@@ -75,16 +75,15 @@ class EchoServer(asyncore.dispatcher):
 
         #debug
         logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
-        time.sleep(.002)
-    # time.sleep(.002)
+        #time.sleep(.002)
         self.canWrite = True
-        self.canRead = False
+        #self.canRead = False
 
     def writable(self):
         return bool(self.canWrite)
 
-    def readable(self):
-        return bool(self.canRead)
+    #def readable(self):
+        #return bool(self.canRead)
 
     def handle_write(self):
         #print "handle_write sending..."
@@ -98,7 +97,7 @@ class EchoServer(asyncore.dispatcher):
             logging.debug('sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack)) 
 
         self.canWrite = False
-        self.canRead = True
+        #self.canRead = True
         self.startTime = time.time()
 
     @outerThread
