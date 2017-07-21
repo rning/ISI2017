@@ -82,15 +82,9 @@ class EchoServer(asyncore.dispatcher):
         self.canRead = False
 
     def writable(self):
-        self.wcount += 1
-        if self.wcount <= 50:
-            logging.debug("writeable: " + str(self.canWrite))
         return bool(self.canWrite)
 
     def readable(self):
-        self.rcount += 1
-        if self.wcount <= 50:
-            print "readable: ", self.canRead
         return bool(self.canRead)
 
     def handle_write(self):
