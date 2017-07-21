@@ -19,6 +19,8 @@ class Client(asyncore.dispatcher):
         print "handle_read reading..."
 
         readBuffer = self.recv(4096)
+        logging.debug(str(len(readBuffer)))
+        
         for i in range(0, len(readBuffer) / 40):
             #unpack structure sent from server: [seq,ack,string]
             packet = struct.unpack('LL24s', readBuffer[:41]) #size: 32 bytes

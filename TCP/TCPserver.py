@@ -61,7 +61,6 @@ class EchoServer(asyncore.dispatcher):
         logging.debug("handle_read reading...")
 
         readBuffer = self.recv(4096)
-        logging.debug(str(readBuffer))
         logging.debug(str(len(readBuffer)))
         
         for i in range(0, len(readBuffer) / 40):
