@@ -102,12 +102,12 @@ class EchoServer(asyncore.dispatcher):
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
                         if self.ssthresh == self.cwnd:
                             self.canWrite = True
-                            logging.debug("cwnd reached threshhold, ssthresh:" + self.ssthresh)
+                            logging.debug("cwnd reached threshhold, ssthresh:" + str(self.ssthresh))
                         else:
                             self.ssthresh = self.cwnd
                             self.cwnd = self.cwnd * 2
                             self.canWrite = True
-                            logging.debug("cwnd multiplied by 2, ssthresh:" + self.ssthresh)
+                            logging.debug("cwnd multiplied by 2, ssthresh:" + str(self.ssthresh))
                 else:
                     #if function not exited by now (meaning all packets not acked), retransmit
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
