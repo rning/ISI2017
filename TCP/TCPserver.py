@@ -47,7 +47,14 @@ class EchoServer(asyncore.dispatcher):
         self.canRead = True
 
         logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+        self.initParams()
         self.packetCheck()
+
+    def initParams(self):
+        self.maxwnd = parameter("maxwnd")
+        logging.debug("MAXWND IS: " + self.maxwnd)
+        self.timeoutTime = parameter("timeoutTime")
+        self.programTotalMaxTime = parameter("programTotalMaxTime")
     
     def readable(self):
         return bool(self.canRead)
@@ -94,10 +101,6 @@ class EchoServer(asyncore.dispatcher):
 
     @outerThread
     def packetCheck(self):
-        self.maxwnd = parameter("maxwnd")
-        logging.debug("MAXWND IS: " + self.maxwnd)
-        self.timeoutTime = parameter("timeoutTime")
-        self.programTotalMaxTime = parameter("programTotalMaxTime")
         while True: 
             if self.startTime is None:
                 pass
