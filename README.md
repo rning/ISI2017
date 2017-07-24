@@ -10,88 +10,74 @@
 ## Current Outputs
 
 ##### Current Thoughts on Errors
-*These errors might be due to the client sending acks in between each packet, but the server is not checking for them (since it is busy sending).*
+  *No Errors*
+  
 ##### Possible Solutions
-*Figure out a way to check if all packets were sent from the server, perhaps send the current window alongside the acks and check if the number of packets sent meets the current window criteria. The problem with the idea is that it kind of defeats the purpose of TCP.*
-
-*Or, we can make a third thread and have the server constantly also be reading acks* (I like this idea)
+  *No Errors* 
 
 #### TCPclient.py:
 ```
 Enter IP address of server in single quotes:
-'206.117.31.111'
+'10.1.1.2'
 handle_read reading...
+40
 received packet with seq# 1 ack# 0
 sending ack
 handle_read reading...
+40
 received packet with seq# 2 ack# 1
 sending ack
 handle_read reading...
+40
 received packet with seq# 3 ack# 1
 sending ack
 handle_read reading...
-received packet with seq# 3 ack# 2
-handle_read reading...
-received packet with seq# 4 ack# 2
+40
+received packet with seq# 4 ack# 3
 sending ack
 handle_read reading...
-received packet with seq# 5 ack# 2
+120
+received packet with seq# 5 ack# 3
 sending ack
-handle_read reading...
-received packet with seq# 6 ack# 2
+received packet with seq# 6 ack# 3
 sending ack
-handle_read reading...
-Client: Connection Closed
-error: uncaptured python exception, closing channel <__main__.Client 206.117.31.111:8080 at 0x28200c8> (<class 'struct.error'>:unpack requires a string argument of length 32 [C:\Python27\lib\asyncore.py|read|83] [C:\Python27\lib\asyncore.py|handle_read_event|449] [TCPclient.py|handle_read|23])
-Client: Connection Closed
+received packet with seq# 7 ack# 3
+sending ack
 ```
 
 #### TCPserver.py:
 ```
-Server: Connection by  ('206.117.31.111', 50687)
-readable:  False
-writeable:  True
+Enter IP address of server in single quotes:
+'10.1.1.2'
+Server: Waiting for connection...
+Server: Connection by  ('10.1.1.3', 32944)
 sent packet with seq# 1 ack# 0
-readable:  True
-writeable:  False
 handle_read reading...
+40
 acked 1 sequence 1 cwnd 1
-acked 1 sequence 1 cwnd 1
-acked 1 sequence 1 cwnd 1
-acked 1 sequence 1 cwnd 1
-ackedstartTime is NOT None
-1entered timeout check
- 1sequence  ==1  1cwnd
- multiplied cwnd by 21
-
-readable:  False
-writeable:  True
+cwnd multiplied by 2, ssthresh:1
 sent packet with seq# 2 ack# 1
 sent packet with seq# 3 ack# 1
-readable:  True
-writeable:  False
 handle_read reading...
-ackedstartTime is NOT None
-2entered timeout check
-sequence2  2==  cwnd2
-2multiplied cwnd by 2
-
-readable:  False
-writeable:  True
-sent packet with seq# 3 ack# 2
-sent packet with seq#startTime is NOT None
-4entered timeout check
-ack#2  2==
- sent packet with seq#2
-5multiplied cwnd by 2
-ack# 2
-sent packet with seq# 6 ack# startTime is NOT None2
-
-readable: entered timeout check
-True2
- writeable: ==  False2
-
-handle_read reading...multiplied cwnd by 2
-
-error: uncaptured python exception, closing channel <__main__.EchoServer connected 206.117.31.111:50687 at 0x39c1e88> (<class 'struct.error'>:unpack requires a string argument of length 32 [C:\Python27\lib\asyncore.py|read|83] [C:\Python27\lib\asyncore.py|handle_read_event|449] [TCPserver.py|handle_read|59])
+40
+acked 2 sequence 2 cwnd 2
+handle_read reading...
+40
+acked 3 sequence 3 cwnd 2
+cwnd multiplied by 2, ssthresh:2
+sent packet with seq# 4 ack# 3
+sent packet with seq# 5 ack# 3
+sent packet with seq# 6 ack# 3
+sent packet with seq# 7 ack# 3
+handle_read reading...
+40
+acked 4 sequence 4 cwnd 4
+handle_read reading...
+40
+acked 5 sequence 5 cwnd 4
+handle_read reading...
+80
+acked 6 sequence 6 cwnd 4
+acked 7 sequence 7 cwnd 4
+cwnd multiplied by 2, ssthresh:4
 ```
