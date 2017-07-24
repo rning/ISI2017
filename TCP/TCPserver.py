@@ -59,7 +59,7 @@ class EchoServer(asyncore.dispatcher):
             if self.retransmit:
                 logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
                 readbuffer = readBuffer[40:]
-                return
+                break
             #if received ack is in right order increment ACK appropriately
             elif packet[1] == self.ack + 1:
                 self.ack += 1
