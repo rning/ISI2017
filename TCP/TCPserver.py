@@ -38,7 +38,7 @@ class EchoServer(asyncore.dispatcher):
         self.ackCounter = 0
         self.cwnd = 1
         self.ssthresh = 0 #what initial value to set?
-        self.timeoutTime = 30 #time in seconds
+        self.timeoutTime = 4 #time in seconds
         self.maxwnd = 16
         self.startTime = None
         self.canWrite = True
