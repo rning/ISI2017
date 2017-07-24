@@ -1,6 +1,3 @@
-data: data
-packSize: ree
-cwndStart: ree
-maxwnd: ree
-timeoutTime: ree
-
+maxwnd: 8
+timeoutTime: 4
+programTotalMaxTime: 30

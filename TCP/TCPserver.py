@@ -1,5 +1,7 @@
 import asyncore, socket, struct, time, threading, logging
-#from ParameterParser import *
+from ParameterParser import parameter
+
+pStartTime = time.time()
 
 class Server(asyncore.dispatcher):
 
@@ -45,11 +47,17 @@ class EchoServer(asyncore.dispatcher):
         self.canRead = True
 
         logging.basicConfig(format='%(message)s', level=logging.DEBUG)
-
+        self.setInitVars()
         self.packetCheck()
+    
+    def setInitVars(self):
+        self.maxwnd = parameter("maxwnd")
+        self.timeoutTime = parameter("timeoutTime")
+        programTotalMaxTime = parameter("programTotalMaxTime")
 
     def readable(self):
         return bool(self.canRead)
+
     def handle_read(self):
         logging.debug("handle_read reading...")
 
@@ -95,6 +103,9 @@ class EchoServer(asyncore.dispatcher):
         while True: 
             if self.startTime is None:
                 pass
+            elif time.time() - pStartTime >= programTotalMaxTime:
+                logging.warning('Program reached set max time, exiting')
+                sys.exit()
             else:
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout if all packets acked
@@ -126,7 +137,6 @@ class EchoServer(asyncore.dispatcher):
                     logging.debug("timeout -> retransmit")
 
                     self.ackCounter = 0
-
             time.sleep(.002)
 
 if __name__ == '__main__':
