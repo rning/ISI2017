@@ -100,7 +100,7 @@ class EchoServer(asyncore.dispatcher):
         while True: 
             if self.startTime is None:
                 pass
-            elif time.time() - pStartTime >= programTotalMaxTime:
+            elif time.time() - pStartTime >= self.programTotalMaxTime:
                 logging.warning('Program reached set max time, exiting')
                 sys.exit()
             else:
