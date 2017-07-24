@@ -107,7 +107,16 @@ class EchoServer(asyncore.dispatcher):
             else:
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout if all packets acked
-                    if self.ackCounter == self.cwnd:
+
+                    if self.ack > self.maxwnd:
+                        self.ack = self.cwnd - 1
+                        self.seq = self.cwnd - 1
+                        self.cwnd = self.cwnd / 2
+                        self.canWrite = True
+                        self.retransmit = True
+                        self.canRead = False
+                        logging.debug("exceeded wnd, -> retransmit")
+                    elif self.ackCounter == self.cwnd:
                         self.ackCounter = 0
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
                         if self.ssthresh == self.cwnd:
@@ -118,14 +127,6 @@ class EchoServer(asyncore.dispatcher):
                             self.cwnd = self.cwnd * 2
                             self.canWrite = True
                             logging.debug("cwnd multiplied by 2, ssthresh:" + str(self.ssthresh))
-                    elif self.ack > self.maxwnd:
-                        self.ack = self.cwnd - 1
-                        self.seq = self.cwnd - 1
-                        self.cwnd = self.cwnd / 2
-                        self.canWrite = True
-                        self.retransmit = True
-                        self.canRead = False
-                        logging.debug("exceeded wnd, -> retransmit")
                 else:
                     #if function not exited by now (meaning all packets not acked), retransmit
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
