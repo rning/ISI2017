@@ -95,7 +95,7 @@ class EchoServer(asyncore.dispatcher):
     @outerThread
     def packetCheck(self):
         self.maxwnd = parameter("maxwnd")
-        logging.debug("MAXWND IS: " + maxwnd)
+        logging.debug("MAXWND IS: " + self.maxwnd)
         self.timeoutTime = parameter("timeoutTime")
         self.programTotalMaxTime = parameter("programTotalMaxTime")
         while True: 
