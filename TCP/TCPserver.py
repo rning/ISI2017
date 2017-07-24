@@ -42,11 +42,14 @@ class EchoServer(asyncore.dispatcher):
         self.maxwnd = 16
         self.startTime = None
         self.canWrite = True
+        self.canRead = True
 
         logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 
         self.packetCheck()
-        
+
+    def readable(self):
+        return bool(self.canRead)
     def handle_read(self):
         logging.debug("handle_read reading...")
 
@@ -84,6 +87,7 @@ class EchoServer(asyncore.dispatcher):
             logging.debug('sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack)) 
 
         self.canWrite = False
+        self.canRead = True
         self.startTime = time.time()
 
     @outerThread
@@ -109,6 +113,7 @@ class EchoServer(asyncore.dispatcher):
                         self.cwnd = self.cwnd / 2
                         self.canWrite = True
                         self.retransmit = True
+                        self.canRead = False
                         self.ack = self.cwnd - 1
                         self.seq = self.cwnd
                         logging.debug("exceeded maxwnd, ack = 0 -> retransmit")
