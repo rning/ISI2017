@@ -105,12 +105,12 @@ class EchoServer(asyncore.dispatcher):
                             self.cwnd = self.cwnd * 2
                             self.canWrite = True
                             logging.debug("cwnd multiplied by 2, ssthresh:" + str(self.ssthresh))
-                elif self.ack > self.maxwnd:
-                    self.ack = 0
-                    self.cwnd = self.cwnd / 2
-                    self.canWrite = True
-                    self.retransmit = True
-                    logging.debug("exceeded maxwnd, ack = 0 -> retransmit")
+                    elif self.ack > self.maxwnd:
+                        self.ack = 0
+                        self.cwnd = self.cwnd / 2
+                        self.canWrite = True
+                        self.retransmit = True
+                        logging.debug("exceeded maxwnd, ack = 0 -> retransmit")
                 else:
                     #if function not exited by now (meaning all packets not acked), retransmit
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
