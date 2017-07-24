@@ -39,7 +39,7 @@ class EchoServer(asyncore.dispatcher):
         self.cwnd = 1
         self.ssthresh = 0 #what initial value to set?
         self.timeoutTime = 30 #time in seconds
-        self.maxwnd = 8
+        self.maxwnd = 16
         self.startTime = None
         self.canWrite = True
 
@@ -51,14 +51,17 @@ class EchoServer(asyncore.dispatcher):
         logging.debug("handle_read reading...")
 
         readBuffer = self.recv(4096)
-        logging.debug(str(len(readBuffer)))
+        # logging.debug(str(len(readBuffer)))
         
         for i in range(0, len(readBuffer) / 40):
             #unpack structure received from client: [seq,ack,string]
             packet = struct.unpack('LL24s', readBuffer[:40]) #size: 32 bytes
-
+            if self.retransmit:
+                logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
+                readbuffer = readBuffer[40:]
+                return
             #if received ack is in right order increment ACK appropriately
-            if packet[1] == self.ack + 1:
+            elif packet[1] == self.ack + 1:
                 self.ack += 1
                 self.seq += 1
                 self.ackCounter += 1
@@ -71,6 +74,8 @@ class EchoServer(asyncore.dispatcher):
 
     def handle_write(self):
         #for loop to send cwnd# of packets
+        self.retransmit = False # reset handle_read exit conditional
+
         for i in range(1, (self.cwnd + 1)):
             #pack structure and send to client: [seq,ack,string]
             self.send(struct.pack('LL24s', self.seq + i, self.ack, 'data'))
@@ -100,6 +105,12 @@ class EchoServer(asyncore.dispatcher):
                             self.cwnd = self.cwnd * 2
                             self.canWrite = True
                             logging.debug("cwnd multiplied by 2, ssthresh:" + str(self.ssthresh))
+                elif self.ack > self.maxwnd:
+                    self.ack = 0
+                    self.cwnd = self.cwnd / 2
+                    self.canWrite = True
+                    self.retransmit = True
+                    logging.debug("exceeded maxwnd, ack = 0 -> retransmit")
                 else:
                     #if function not exited by now (meaning all packets not acked), retransmit
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
