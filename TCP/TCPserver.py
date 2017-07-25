@@ -30,6 +30,14 @@ def outerThread(function):
         return packThread
     return checkWrap
 
+def logThreadHandler(function):
+    def handleWrapper(*args):
+        logThread = threading.Thread(target=function, args=args)
+        logthread.setDaemon(True)
+        logThread.start()
+        return logThread
+    return logThread
+
 class EchoServer(asyncore.dispatcher):
 
     def __init__(self, sock):
@@ -46,13 +54,14 @@ class EchoServer(asyncore.dispatcher):
         self.canWrite = True
         self.canRead = True
 
-        logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+        logging.basicConfig(format='%(message)s', filename='XYlog.txt' level=logging.DEBUG)
+        self.logThread()
         self.initParams()
         self.packetCheck()
 
     def initParams(self):
         self.maxwnd = int(parameter("maxwnd"))
-        logging.debug("MAXWND IS: " + str(self.maxwnd))
+        # logging.debug("MAXWND IS: " + str(self.maxwnd))
         self.timeoutTime = int(parameter("timeoutTime"))
         self.programTotalMaxTime = int(parameter("programTotalMaxTime"))
     
@@ -60,7 +69,7 @@ class EchoServer(asyncore.dispatcher):
         return bool(self.canRead)
 
     def handle_read(self):
-        logging.debug("handle_read reading...")
+        # logging.debug("handle_read reading...")
         self.isSending = False
 
         readBuffer = self.recv(4096)
@@ -70,7 +79,7 @@ class EchoServer(asyncore.dispatcher):
             #unpack structure received from client: [seq,ack,string]
             packet = struct.unpack('LL24s', readBuffer[:40]) #size: 32 bytes
             if self.retransmit:
-                logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
+                # logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
                 readbuffer = readBuffer[40:]
                 break
             #if received ack is in right order increment ACK appropriately
@@ -79,7 +88,7 @@ class EchoServer(asyncore.dispatcher):
                 self.seq += 1
                 self.ackCounter += 1
 
-                logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
+                # logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
             readBuffer = readBuffer[40:]
 
     def writable(self):
@@ -95,7 +104,7 @@ class EchoServer(asyncore.dispatcher):
             #pack structure and send to client: [seq,ack,string]
             self.send(struct.pack('LL24s', self.seq + i, self.ack, 'data'))
             #debug
-            logging.debug('sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack)) 
+            # logging.debug('sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack)) 
 
         self.canWrite = False
         self.canRead = True
@@ -107,7 +116,7 @@ class EchoServer(asyncore.dispatcher):
             if self.startTime is None:
                 pass
             elif time.time() - pStartTime >= self.programTotalMaxTime:
-                logging.warning('Program reached set max time, exiting')
+                # logging.warning('Program reached set max time, exiting')
                 sys.exit()
             else:
                 if time.time() - self.startTime < self.timeoutTime:
@@ -122,28 +131,33 @@ class EchoServer(asyncore.dispatcher):
                             self.cwnd = self.cwnd / 2
                             self.ack = self.ackSaved
                             self.seq = self.seqSaved
-                            logging.debug("exceeded wnd, -> retransmit")
+                            # logging.debug("exceeded wnd, -> retransmit")
                     elif self.ackCounter == self.cwnd:
                         self.ackCounter = 0
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
                         if self.ssthresh == self.cwnd:
                             self.canWrite = True
-                            logging.debug("cwnd reached threshhold, ssthresh: " + str(self.ssthresh))
+                            # logging.debug("cwnd reached threshhold, ssthresh: " + str(self.ssthresh))
                         else:
                             self.ssthresh = self.cwnd
                             self.cwnd = self.cwnd * 2
                             self.canWrite = True
-                            logging.debug("cwnd multiplied by 2, ssthresh:" + str(self.ssthresh))
+                            # logging.debug("cwnd multiplied by 2, ssthresh:" + str(self.ssthresh))
                 else:
                     #if function not exited by now (meaning all packets not acked), retransmit
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
                     self.cwnd = self.cwnd / 2
                     if self.cwnd < 1: cwnd = 1
                     self.canWrite = True
-                    logging.debug("timeout -> retransmit")
+                    # logging.debug("timeout -> retransmit")
 
                     self.ackCounter = 0
             time.sleep(.002)
+
+    @logThreadHandler
+    def logThread(self):
+        logging.info('%s %s', self.cwnd, time.time() - self.pStartTime)
+        time.sleep(.002)
 
 if __name__ == '__main__':
     try:
