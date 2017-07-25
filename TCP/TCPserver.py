@@ -1,8 +1,6 @@
 import asyncore, socket, struct, time, threading, logging, sys
 from ParameterParser import parameter
 
-pStartTime = time.time()
-
 class Server(asyncore.dispatcher):
 
     def __init__(self, host, port):
@@ -20,6 +18,7 @@ class Server(asyncore.dispatcher):
         self.sock, self.address = self.accept()
         print "Server: Connection by ", self.address
         self.sock.setblocking(0)
+        pStartTime = time.time()
         EchoServer(self.sock)
 
 def outerThread(function):
@@ -33,10 +32,10 @@ def outerThread(function):
 def logThreadHandler(function):
     def handleWrapper(*args):
         logThread = threading.Thread(target=function, args=args)
-        logthread.setDaemon(True)
+        logThread.setDaemon(True)
         logThread.start()
         return logThread
-    return logThread
+    return handleWrapper
 
 class EchoServer(asyncore.dispatcher):
 
@@ -53,18 +52,22 @@ class EchoServer(asyncore.dispatcher):
         self.startTime = None
         self.canWrite = True
         self.canRead = True
+        self.packetLength = 32
 
-        logging.basicConfig(format='%(message)s', filename='XYlog.txt' level=logging.DEBUG)
-        self.logThread()
+        logging.basicConfig(format='%(message)s', filename='XYlog.txt', filemode='w', level=logging.DEBUG)
         self.initParams()
+        self.logThread()
         self.packetCheck()
+        gThreadDelay = self.threadDelay
 
     def initParams(self):
         self.maxwnd = int(parameter("maxwnd"))
         # logging.debug("MAXWND IS: " + str(self.maxwnd))
         self.timeoutTime = int(parameter("timeoutTime"))
-        self.programTotalMaxTime = int(parameter("programTotalMaxTime"))
-    
+        self.programTotalMaxTime = int(parameter("programTotalMaxTime")) 
+        self.ssthreshEnabled = bool(parameter("ssthreshEnabled"))
+        self.threadDelay = float(parameter("Delay"))
+
     def readable(self):
         return bool(self.canRead)
 
@@ -75,12 +78,12 @@ class EchoServer(asyncore.dispatcher):
         readBuffer = self.recv(4096)
         # logging.debug(str(len(readBuffer)))
         
-        for i in range(0, len(readBuffer) / 40):
+        for i in range(0, len(readBuffer) / self.packetLength):
             #unpack structure received from client: [seq,ack,string]
-            packet = struct.unpack('LL24s', readBuffer[:40]) #size: 32 bytes
+            packet = struct.unpack('LL24s', readBuffer[:self.packetLength]) #size: 32 bytes
             if self.retransmit:
                 # logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
-                readbuffer = readBuffer[40:]
+                readbuffer = readBuffer[self.packetLength:]
                 break
             #if received ack is in right order increment ACK appropriately
             elif packet[1] == self.ack + 1:
@@ -89,7 +92,7 @@ class EchoServer(asyncore.dispatcher):
                 self.ackCounter += 1
 
                 # logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
-            readBuffer = readBuffer[40:]
+            readBuffer = readBuffer[self.packetLength:]
 
     def writable(self):
         return bool(self.canWrite)
@@ -104,7 +107,7 @@ class EchoServer(asyncore.dispatcher):
             #pack structure and send to client: [seq,ack,string]
             self.send(struct.pack('LL24s', self.seq + i, self.ack, 'data'))
             #debug
-            # logging.debug('sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack)) 
+            # logging.debug('sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack))
 
         self.canWrite = False
         self.canRead = True
@@ -135,10 +138,10 @@ class EchoServer(asyncore.dispatcher):
                     elif self.ackCounter == self.cwnd:
                         self.ackCounter = 0
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
-                        if self.ssthresh == self.cwnd:
+                        if self.ssthresh == self.cwnd and self.ssthreshEnabled:
                             self.canWrite = True
                             # logging.debug("cwnd reached threshhold, ssthresh: " + str(self.ssthresh))
-                        else:
+                        elif self.ssthresh is not self.cwnd:
                             self.ssthresh = self.cwnd
                             self.cwnd = self.cwnd * 2
                             self.canWrite = True
@@ -152,17 +155,20 @@ class EchoServer(asyncore.dispatcher):
                     # logging.debug("timeout -> retransmit")
 
                     self.ackCounter = 0
-            time.sleep(.002)
+            time.sleep(self.threadDelay)
 
     @logThreadHandler
     def logThread(self):
-        logging.info('%s %s', self.cwnd, time.time() - self.pStartTime)
-        time.sleep(.002)
+        while(True):
+            logging.info('%s %s', self.cwnd, time.time() - pStartTime)
+            time.sleep(self.threadDelay)
 
 if __name__ == '__main__':
+    pStartTime = time.time()
+    gThreadDelay = float(parameter("Delay"))
     try:
         add = str(input("Enter IP address of server in single quotes:\n"))
         s = Server(add, 8080)
     except:
         print "Your address was typed incorrectly or the port is in timeout. Try again."
-    asyncore.loop(0)
+    asyncore.loop(gThreadDelay)

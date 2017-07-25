@@ -7,6 +7,7 @@ class Client(asyncore.dispatcher):
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connect((host, port))
+        self.packetLength = 32
 
         self.seq = 0
         self.ack = 0
@@ -21,9 +22,9 @@ class Client(asyncore.dispatcher):
         readBuffer = self.recv(4096)
         print str(len(readBuffer))
         
-        for i in range(0, len(readBuffer) / 40):
+        for i in range(0, len(readBuffer) / 32):
             #unpack structure sent from server: [seq,ack,string]
-            packet = struct.unpack('LL24s', readBuffer[:40]) #size: 32 bytes
+            packet = struct.unpack('LL24s', readBuffer[:32]) #size: 32 bytes
             print 'received packet with seq#' , packet[0], 'ack#', packet[1] 
 
             #increment ACK based on receieved pack seq
@@ -38,8 +39,7 @@ class Client(asyncore.dispatcher):
                 self.send(struct.pack('LL24s', self.seq, self.ack, 'data'))
                 print 'redefined ack, sending ack'
 
-
-            readBuffer = readBuffer[40:]
+            readBuffer = readBuffer[32:]
 
 if __name__ == '__main__':
 
