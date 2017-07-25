@@ -94,6 +94,7 @@ class EchoServer(asyncore.dispatcher):
             self.send(struct.pack('LL24s', self.seq + i, self.ack, 'data'))
             #debug
             logging.debug('sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack)) 
+            self.isSending = True
 
         self.canWrite = False
         self.canRead = True
@@ -110,7 +111,7 @@ class EchoServer(asyncore.dispatcher):
             else:
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout if all packets acked
-                    if self.ack > self.maxwnd and self.cwnd > self.maxwnd:
+                    if self.ack > self.maxwnd:
                         self.canWrite = True
                         self.retransmit = True
                         self.canRead = False
