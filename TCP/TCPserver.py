@@ -112,14 +112,16 @@ class EchoServer(asyncore.dispatcher):
             else:
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout if all packets acked
-                    if self.ack is self.maxwnd and not self.isSending:
-                        self.ackSaved = self.ack
-                        if self.ack > self.maxwnd:
+                    if self.ackCounter == self.maxwnd and not self.isSending:
+                        self.ackSaved = self.ack + 1
+                        self.seqSaved = self.seq + 1
+                        if self.ackCounter > self.maxwnd:
                             self.canWrite = True
                             self.retransmit = True
                             self.canRead = False
                             self.cwnd = self.cwnd / 2
                             self.ack = self.ackSaved
+                            self.seq = self.seqSaved
                             logging.debug("exceeded wnd, -> retransmit")
                     elif self.ackCounter == self.cwnd:
                         self.ackCounter = 0
