@@ -2,10 +2,13 @@
 
 ## Goal Tracking
 - [x] Scalable Send/Receive Between Client and Server nodes
-- [ ] Create trackable TCP simulation
-  - [ ] Slow Start
-  - [ ] Packet Loss
+- [x] Create trackable TCP simulation
+  - [x] Slow Start
+  - [x] Packet Loss
 - [ ] Create Visualization
+  - [ ] Remove tty prints
+  - [ ] Add log.txt printing
+  - [ ] Parse log.txt for x and y coord values
 
 ## Current Outputs
 
