@@ -51,10 +51,10 @@ class EchoServer(asyncore.dispatcher):
         self.packetCheck()
 
     def initParams(self):
-        self.maxwnd = parameter("maxwnd")
+        self.maxwnd = int(parameter("maxwnd"))
         logging.debug("MAXWND IS: " + self.maxwnd)
-        self.timeoutTime = parameter("timeoutTime")
-        self.programTotalMaxTime = parameter("programTotalMaxTime")
+        self.timeoutTime = int(parameter("timeoutTime"))
+        self.programTotalMaxTime = int(parameter("programTotalMaxTime"))
     
     def readable(self):
         return bool(self.canRead)
@@ -104,9 +104,9 @@ class EchoServer(asyncore.dispatcher):
         while True: 
             if self.startTime is None:
                 pass
-           # elif time.time() - pStartTime >= self.programTotalMaxTime:
-           #     logging.warning('Program reached set max time, exiting')
-           #     sys.exit()
+            elif time.time() - pStartTime >= self.programTotalMaxTime:
+                logging.warning('Program reached set max time, exiting')
+                sys.exit()
             else:
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout if all packets acked
