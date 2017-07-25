@@ -112,8 +112,8 @@ class EchoServer(asyncore.dispatcher):
                     #exit timeout if all packets acked
 
                     if self.ack > self.maxwnd:
-                        self.ack = self.cwnd - 1
-                        self.seq = self.cwnd - 1
+                        # self.ack = self.cwnd - 1
+                        # self.seq = self.cwnd - 1
                         self.cwnd = self.cwnd / 2
                         self.canWrite = True
                         self.retransmit = True

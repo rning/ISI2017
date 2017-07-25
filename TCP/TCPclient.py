@@ -33,10 +33,10 @@ class Client(asyncore.dispatcher):
                 #pack structure and send to server: [seq,ack,string]
                 self.send(struct.pack('LL24s', self.seq, self.ack, 'data'))
                 print 'sending ack'
-            else:
-                self.ack = packet[0] # For retransmit, if it is out of sync, resync self.ack
-                self.send(struct.pack('LL24s', self.seq, self.ack, 'data'))
-                print 'redefined ack, sending ack'
+           # else:
+           #     self.ack = packet[0] # For retransmit, if it is out of sync, resync self.ack
+           #     self.send(struct.pack('LL24s', self.seq, self.ack, 'data'))
+           #     print 'redefined ack, sending ack'
 
 
             readBuffer = readBuffer[40:]
