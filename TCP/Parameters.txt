@@ -1,5 +1,5 @@
-maxwnd: 32768
+maxwnd: 256
 timeoutTime: 1
 programTotalMaxTime: 15
 ssthreshEnabled: True
-Delay: 0.0001
+Delay: 0.02
