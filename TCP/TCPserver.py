@@ -61,6 +61,7 @@ class EchoServer(asyncore.dispatcher):
 
     def handle_read(self):
         logging.debug("handle_read reading...")
+        self.isSending = False
 
         readBuffer = self.recv(4096)
         # logging.debug(str(len(readBuffer)))
@@ -89,12 +90,12 @@ class EchoServer(asyncore.dispatcher):
         self.retransmit = False # reset handle_read exit conditional
         afterTransmitCounter = 0
         
+        self.isSending = True
         for i in range(1, (self.cwnd + 1)):
             #pack structure and send to client: [seq,ack,string]
             self.send(struct.pack('LL24s', self.seq + i, self.ack, 'data'))
             #debug
             logging.debug('sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack)) 
-            self.isSending = True
 
         self.canWrite = False
         self.canRead = True
@@ -111,12 +112,15 @@ class EchoServer(asyncore.dispatcher):
             else:
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout if all packets acked
-                    if self.ack > self.maxwnd:
-                        self.canWrite = True
-                        self.retransmit = True
-                        self.canRead = False
-                        self.cwnd = self.cwnd / 2
-                        logging.debug("exceeded wnd, -> retransmit")
+                    if self.ack is self.maxwnd and not self.isSending:
+                        self.ackSaved = self.ack
+                        if self.ack > self.maxwnd:
+                            self.canWrite = True
+                            self.retransmit = True
+                            self.canRead = False
+                            self.cwnd = self.cwnd / 2
+                            self.ack = self.ackSaved
+                            logging.debug("exceeded wnd, -> retransmit")
                     elif self.ackCounter == self.cwnd:
                         self.ackCounter = 0
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
