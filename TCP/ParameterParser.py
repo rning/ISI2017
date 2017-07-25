@@ -6,7 +6,7 @@ def parameter(pname):
     for line in parameters:
         parameterVariables = line.split(": ")
         tempVar = parameterVariables[0]
-        tempVal = parameterVariables[1].replace("\n", "")
+        tempVal = parameterVariables[1].strip("\n ")
         varDict[tempVar] = tempVal
     return varDict[pname]
 # refer to variables with parameter({parameter}), which will return the parameter's value.
