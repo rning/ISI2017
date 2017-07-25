@@ -87,11 +87,11 @@ class EchoServer(asyncore.dispatcher):
     def handle_write(self):
         #for loop to send cwnd# of packets
         self.retransmit = False # reset handle_read exit conditional
-
+        afterTransmitCounter = 0
+        
         for i in range(1, (self.cwnd + 1)):
             #pack structure and send to client: [seq,ack,string]
             self.send(struct.pack('LL24s', self.seq + i, self.ack, 'data'))
-
             #debug
             logging.debug('sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack)) 
 
@@ -111,12 +111,10 @@ class EchoServer(asyncore.dispatcher):
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout if all packets acked
                     if self.ack > self.maxwnd and self.cwnd > self.maxwnd:
-                        self.ack = self.cwnd - 1
-                        self.seq = self.cwnd - 1
-                        self.cwnd = self.cwnd / 2
                         self.canWrite = True
                         self.retransmit = True
                         self.canRead = False
+                        self.cwnd = self.cwnd / 2
                         logging.debug("exceeded wnd, -> retransmit")
                     elif self.ackCounter == self.cwnd:
                         self.ackCounter = 0
