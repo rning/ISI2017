@@ -52,7 +52,7 @@ class EchoServer(asyncore.dispatcher):
 
     def initParams(self):
         self.maxwnd = int(parameter("maxwnd"))
-        logging.debug("MAXWND IS: " + self.maxwnd)
+        logging.debug("MAXWND IS: " + str(self.maxwnd))
         self.timeoutTime = int(parameter("timeoutTime"))
         self.programTotalMaxTime = int(parameter("programTotalMaxTime"))
     
