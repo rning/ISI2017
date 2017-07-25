@@ -2,9 +2,9 @@
 
 ## How to use this tool (Will currently only work on windows)
 1. Run `TCP\TCPserver.py`
-  - Make sure to input `'localhost'`, or the local IP of the server.
+    - Make sure to input `'localhost'`, or the local IP of the server.
 2. Run `TCP\TCPclient.py`
-  - You must also input `'localhost'`, or the IP of the computer that is running `TCPserver.py`.
+    - You'll be prompted to input `'localhost'` if both TCPserver.py and TCPclient.py are running on the same computer, or the IP of the computer that is running `TCPserver.py`.
 3. To view a graph of the data, run `TCP\timeVScwndPLOT.py`
 4. *Optional* You can change some parameters for the simulation and then repeat steps 1-3. There is an explanation of the parameters below.
 
