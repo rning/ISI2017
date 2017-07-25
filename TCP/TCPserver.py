@@ -104,16 +104,16 @@ class EchoServer(asyncore.dispatcher):
         while True: 
             if self.startTime is None:
                 pass
-            elif time.time() - pStartTime >= self.programTotalMaxTime:
-                logging.warning('Program reached set max time, exiting')
-                sys.exit()
+           # elif time.time() - pStartTime >= self.programTotalMaxTime:
+           #     logging.warning('Program reached set max time, exiting')
+           #     sys.exit()
             else:
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout if all packets acked
 
                     if self.ack > self.maxwnd:
-                        # self.ack = self.cwnd - 1
-                        # self.seq = self.cwnd - 1
+                        self.ack = self.cwnd - 1
+                        self.seq = self.cwnd - 1
                         self.cwnd = self.cwnd / 2
                         self.canWrite = True
                         self.retransmit = True
