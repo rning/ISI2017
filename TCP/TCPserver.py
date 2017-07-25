@@ -1,4 +1,4 @@
-import asyncore, socket, struct, time, threading, logging
+import asyncore, socket, struct, time, threading, logging, sys
 from ParameterParser import parameter
 
 pStartTime = time.time()
@@ -110,7 +110,7 @@ class EchoServer(asyncore.dispatcher):
             else:
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout if all packets acked
-                    if self.ack > self.maxwnd:
+                    if self.ack > self.maxwnd and self.cwnd > self.maxwnd:
                         self.ack = self.cwnd - 1
                         self.seq = self.cwnd - 1
                         self.cwnd = self.cwnd / 2
