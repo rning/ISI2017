@@ -53,6 +53,7 @@ class EchoServer(asyncore.dispatcher):
         self.canWrite = True
         self.canRead = True
         self.packetLength = 32
+        self.exited = False
 
         logging.basicConfig(format='%(message)s', filename='XYlog.txt', filemode='w', level=logging.DEBUG)
         self.initParams()
@@ -83,6 +84,7 @@ class EchoServer(asyncore.dispatcher):
             packet = struct.unpack('LL24s', readBuffer[:self.packetLength]) #size: 32 bytes
             if self.retransmit:
                 # logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
+                print 'acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd)
                 readbuffer = readBuffer[self.packetLength:]
                 break
             #if received ack is in right order increment ACK appropriately
@@ -90,11 +92,13 @@ class EchoServer(asyncore.dispatcher):
                 self.ack += 1
                 self.seq += 1
                 self.ackCounter += 1
-
+                print 'acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd)
                 # logging.debug('acked ' + str(self.ack) + ' sequence ' + str(self.seq) + ' cwnd ' + str(self.cwnd))
             readBuffer = readBuffer[self.packetLength:]
 
     def writable(self):
+    	if self.exited is True:
+    		sys.exit()
         return bool(self.canWrite)
 
     def handle_write(self):
@@ -108,6 +112,7 @@ class EchoServer(asyncore.dispatcher):
             self.send(struct.pack('LL24s', self.seq + i, self.ack, 'data'))
             #debug
             # logging.debug('sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack))
+            print 'sent packet with seq# ' + str(self.seq + i) + ' ack# ' + str(self.ack)
 
         self.canWrite = False
         self.canRead = True
@@ -120,11 +125,12 @@ class EchoServer(asyncore.dispatcher):
                 pass
             elif time.time() - pStartTime >= self.programTotalMaxTime:
                 # logging.warning('Program reached set max time, exiting')
+                self.exited = True
                 sys.exit()
             else:
                 if time.time() - self.startTime < self.timeoutTime:
                     #exit timeout if all packets acked
-                    if self.ackCounter == self.maxwnd and not self.isSending:
+                    if self.ackCounter == self.maxwnd and not self.isSending: # check the logic of this vs. below self.cwnd * 2 > self.maxwnd, and currently ssthresh isn't working properly.
                         self.ackSaved = self.ack + 1
                         self.seqSaved = self.seq + 1
                         if self.ackCounter > self.maxwnd:
@@ -138,11 +144,11 @@ class EchoServer(asyncore.dispatcher):
                     elif self.ackCounter == self.cwnd:
                         self.ackCounter = 0
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
-                        if self.ssthresh == self.cwnd and self.ssthreshEnabled:
+                        if self.ssthresh == self.cwnd and self.ssthreshEnabled and self.cwnd * 2 > self.maxwnd:
                             self.canWrite = True
                             # logging.debug("cwnd reached threshhold, ssthresh: " + str(self.ssthresh))
                         elif self.ssthresh is not self.cwnd:
-                            self.ssthresh = self.cwnd
+                            self.ssthresh = self.cwnd if self.ssthreshEnabled else self.ssthresh
                             self.cwnd = self.cwnd * 2
                             self.canWrite = True
                             # logging.debug("cwnd multiplied by 2, ssthresh:" + str(self.ssthresh))
@@ -150,7 +156,8 @@ class EchoServer(asyncore.dispatcher):
                     #if function not exited by now (meaning all packets not acked), retransmit
                     #below code retransmits at half cwnd (alternative would retransmit at cwnd=1)
                     self.cwnd = self.cwnd / 2
-                    if self.cwnd < 1: cwnd = 1
+                    if self.cwnd < 1:
+                        self.cwnd = 1
                     self.canWrite = True
                     # logging.debug("timeout -> retransmit")
 
@@ -162,6 +169,8 @@ class EchoServer(asyncore.dispatcher):
         while(True):
             logging.info('%s %s', self.cwnd, time.time() - pStartTime)
             time.sleep(self.threadDelay)
+            if self.exited is True:
+                sys.exit()
 
 if __name__ == '__main__':
     pStartTime = time.time()
