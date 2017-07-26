@@ -54,6 +54,7 @@ class EchoServer(asyncore.dispatcher):
         self.canRead = True
         self.packetLength = 32
         self.exited = False
+        self.ackCounterSaved = 0
 
         logging.basicConfig(format='%(message)s', filename='XYlog.txt', filemode='w', level=logging.DEBUG)
         self.initParams()
@@ -142,11 +143,12 @@ class EchoServer(asyncore.dispatcher):
                             self.seq = self.seqSaved
                             # logging.debug("exceeded wnd, -> retransmit")
                     elif self.ackCounter == self.cwnd:
+                        self.ackCounterSaved = self.ackCounter
                         self.ackCounter = 0
                         #if ssthresh (maxwnd size) determined, keep transmitting at cwnd
                         if self.ssthresh == self.cwnd and self.ssthreshEnabled and self.cwnd * 2 > self.maxwnd:
                             self.canWrite = True
-                            # logging.debug("cwnd reached threshhold, ssthresh: " + str(self.ssthresh))
+                            # logging.debug("cwnd reached threshold, ssthresh: " + str(self.ssthresh))
                         elif self.ssthresh is not self.cwnd:
                             self.ssthresh = self.cwnd if self.ssthreshEnabled else self.ssthresh
                             self.cwnd = self.cwnd * 2
@@ -160,15 +162,15 @@ class EchoServer(asyncore.dispatcher):
                         self.cwnd = 1
                     self.canWrite = True
                     # logging.debug("timeout -> retransmit")
-
+                    self.ackCounterSaved = self.ackCounter
                     self.ackCounter = 0
-            time.sleep(self.threadDelay)
+            time.sleep(self.threadDelay + 0.0002)
 
     @logThreadHandler
     def logThread(self):
         while(True):
             logging.info('%s %s', self.cwnd, time.time() - pStartTime)
-            time.sleep(self.threadDelay)
+            time.sleep(self.threadDelay + 0.001)
             if self.exited is True:
                 sys.exit()
 
@@ -180,4 +182,4 @@ if __name__ == '__main__':
         s = Server(add, 8080)
     except:
         print "Your address was typed incorrectly or the port is in timeout. Try again."
-    asyncore.loop(gThreadDelay)
+    asyncore.loop(gThreadDelay + 0.002)

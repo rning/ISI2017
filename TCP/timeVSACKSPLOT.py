@@ -14,8 +14,8 @@ plt.plot(x1, y1)
 
 # label plot axis
 plt.xlabel('Time(sec)')
-plt.ylabel('Packets Sent')
-plt.title('Packets Sent At Any Period of Program Execution')
+plt.ylabel('Amount of Successful ACKs')
+plt.title('Amount of Successful ACKs At Any Period of Program Execution')
 plt.legend()
 
 plt.show()
